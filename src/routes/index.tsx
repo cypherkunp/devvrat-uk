@@ -10,7 +10,17 @@ function LinkHubRoute() {
   const locale = loadLocale('en')
   const analytics = createNoopAnalytics()
 
+  const hubUrl =
+    typeof window !== 'undefined'
+      ? window.location.origin
+      : 'https://devvrat.uk'
+
   return (
-    <LinkHubPage locale={locale} analytics={analytics} portraitSrc="/portrait.jpg" />
+    <LinkHubPage
+      locale={locale}
+      analytics={analytics}
+      portraitSrc="/portrait.jpg"
+      hubUrl={hubUrl}
+    />
   )
 }

@@ -6,6 +6,45 @@
     "availability": "Available for Hire",
     "portraitAlt": "Portrait of Devvrat"
   },
+  "links": {
+    "email": {
+      "label": "Email",
+      "title": "Write me",
+      "handle": "devvrat.shukla@gmail.com"
+    },
+    "twitter": {
+      "label": "Twitter",
+      "title": "Signal",
+      "handle": "@devvrathq"
+    },
+    "linkedin": {
+      "label": "LinkedIn",
+      "title": "Proof of work",
+      "handle": "devvratshukla"
+    },
+    "github": {
+      "label": "GitHub",
+      "title": "Repositories",
+      "handle": "cypherkunp"
+    },
+    "central-hub": {
+      "label": "Central Hub",
+      "title": "Primary site",
+      "handle": "devvrat.cc"
+    },
+    "photos": {
+      "label": "Photos",
+      "title": "Gallery",
+      "comingSoon": "Coming soon"
+    }
+  },
+  "actions": {
+    "copy-url": {
+      "label": "Copy URL",
+      "title": "Share this hub",
+      "success": "Copied to clipboard"
+    }
+  },
   "meta": {
     "documentTitle": "Devvrat"
   }
