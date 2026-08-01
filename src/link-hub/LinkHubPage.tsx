@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion } from 'motion/react'
 
 import type { AnalyticsPort } from '#/analytics/port'
-import { hubLinks, type HubLink } from '#/content/hub-config'
+import { copyUrlActionId, hubLinks, type HubLink } from '#/content/hub-config'
 import type { LinkCopy, Locale } from '#/content/locale'
 
 export type LinkHubPageProps = {
@@ -63,18 +63,23 @@ const highlightedTileClass =
 
 export function LinkHubPage({
   locale,
-  analytics: _analytics,
+  analytics,
   portraitSrc,
   hubUrl,
 }: LinkHubPageProps) {
   const { identity } = locale
   const [photosMessage, setPhotosMessage] = useState<string | null>(null)
   const [copyFeedback, setCopyFeedback] = useState<string | null>(null)
-  const copyAction = locale.actions['copy-url']
+  const copyAction = locale.actions[copyUrlActionId]
+
+  useEffect(() => {
+    analytics.track({ type: 'visit' })
+  }, [analytics])
 
   async function copyHubUrl() {
     await navigator.clipboard.writeText(hubUrl)
     setCopyFeedback(copyAction.success)
+    analytics.track({ type: 'action_click', actionId: copyUrlActionId })
   }
 
   return (
@@ -126,6 +131,9 @@ export function LinkHubPage({
                   className={
                     link.highlighted ? highlightedTileClass : tileClass
                   }
+                  onClick={() => {
+                    analytics.track({ type: 'link_click', linkId: link.id })
+                  }}
                 >
                   <TileCaption {...copy} />
                 </a>

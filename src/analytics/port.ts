@@ -1,7 +1,9 @@
+import type { ActionId, LinkId } from '#/content/hub-config'
+
 export type AnalyticsEvent =
   | { type: 'visit' }
-  | { type: 'link_click'; linkId: string }
-  | { type: 'action_click'; actionId: string }
+  | { type: 'link_click'; linkId: Exclude<LinkId, 'photos'> }
+  | { type: 'action_click'; actionId: ActionId }
 
 export type AnalyticsPort = {
   track: (event: AnalyticsEvent) => void

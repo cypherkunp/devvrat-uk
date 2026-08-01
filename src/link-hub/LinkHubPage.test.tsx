@@ -134,4 +134,63 @@ describe('Link Hub page', () => {
       }),
     ).toBeTruthy()
   })
+
+  it('records one Visit when the Link Hub opens', () => {
+    const { analytics } = renderPage()
+
+    expect(analytics.events).toEqual([{ type: 'visit' }])
+    expect(screen.queryByText(/consent|cookie/i)).toBeNull()
+  })
+
+  it('records link_click with the Link id when a configured Link is activated', () => {
+    const { locale, analytics } = renderPage()
+    const email = locale.links.email
+
+    fireEvent.click(
+      screen.getByRole('link', { name: `${email.label}: ${email.title}` }),
+    )
+
+    expect(analytics.events).toContainEqual({
+      type: 'link_click',
+      linkId: 'email',
+    })
+  })
+
+  it('records action_click when Copy URL succeeds', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText },
+    })
+
+    const { locale, analytics } = renderPage()
+    const action = locale.actions['copy-url']
+
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: `${action.label}: ${action.title}`,
+      }),
+    )
+
+    expect(await screen.findByText(action.success)).toBeTruthy()
+    expect(analytics.events).toContainEqual({
+      type: 'action_click',
+      actionId: 'copy-url',
+    })
+  })
+
+  it('does not record link_click for Photos placeholder', () => {
+    const { locale, analytics } = renderPage()
+    const photos = locale.links.photos
+
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: `${photos.label}: ${photos.title}`,
+      }),
+    )
+
+    expect(analytics.events.some((event) => event.type === 'link_click')).toBe(
+      false,
+    )
+  })
 })
