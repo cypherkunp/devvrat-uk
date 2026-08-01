@@ -12,8 +12,98 @@ body,
 
 body {
   margin: 0;
-  background: #0a0a0a;
+  background: #04060d;
   color: #fafafa;
+}
+
+/* --- Neon HUD ------------------------------------------------------------ */
+
+/* Decorative glyphs are generated content so they stay out of the accessible
+   name and out of textContent. */
+.hud-tag::before {
+  content: '// ';
+  opacity: 0.55;
+}
+
+.hud-brackets::before {
+  content: '[';
+  margin-right: 0.45em;
+  opacity: 0.6;
+}
+
+.hud-brackets::after {
+  content: ']';
+  margin-left: 0.45em;
+  opacity: 0.6;
+}
+
+.neon-title {
+  text-shadow:
+    0 0 14px rgba(34, 211, 238, 0.45),
+    0 0 46px rgba(217, 70, 239, 0.3);
+}
+
+/* Chromatic split of the display name, drawn from data-text so the heading
+   keeps exactly one text node. */
+.glitch {
+  position: relative;
+}
+
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+  text-shadow: none;
+}
+
+.glitch::before {
+  color: #22d3ee;
+  clip-path: inset(0 0 52% 0);
+  animation: glitch-upper 5s infinite steps(2, end);
+}
+
+.glitch::after {
+  color: #ff2fd0;
+  clip-path: inset(52% 0 0 0);
+  animation: glitch-lower 5s infinite steps(2, end);
+}
+
+@keyframes glitch-upper {
+  0%,
+  90%,
+  100% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0);
+  }
+  91% {
+    opacity: 0.75;
+    transform: translate3d(-3px, -1px, 0);
+  }
+  94% {
+    opacity: 0.5;
+    transform: translate3d(2px, 1px, 0);
+  }
+}
+
+@keyframes glitch-lower {
+  0%,
+  90%,
+  100% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0);
+  }
+  92% {
+    opacity: 0.65;
+    transform: translate3d(3px, 1px, 0);
+  }
+  96% {
+    opacity: 0.45;
+    transform: translate3d(-2px, -1px, 0);
+  }
 }
 
 /* Motion is enhancement: CSS transitions/animations collapse for reduced-motion
