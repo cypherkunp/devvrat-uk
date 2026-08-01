@@ -3,13 +3,16 @@ import {
   AnimatePresence,
   MotionConfig,
   motion,
+  useMotionTemplate,
+  useMotionValue,
   useReducedMotion,
 } from 'motion/react'
-import type { Variants } from 'motion/react'
+import type { MotionValue, Variants } from 'motion/react'
+import type { PointerEvent } from 'react'
 
 import type { AnalyticsPort } from '#/analytics/port'
 import { copyUrlActionId, hubLinks } from '#/content/hub-config'
-import type { HubLink } from '#/content/hub-config'
+import type { ConfiguredLink, HubLink } from '#/content/hub-config'
 import type { LinkCopy, Locale } from '#/content/locale'
 import { tileArt } from '#/link-hub/tile-art'
 import type { TileArt } from '#/link-hub/tile-art'
@@ -38,22 +41,22 @@ const itemVariants: Variants = {
   visible: { opacity: 1, y: 0 },
 }
 
-const tileClass = [
-  'group relative isolate flex min-h-24 flex-col overflow-hidden',
-  'border px-4 py-3 text-left transition-colors duration-200',
-  'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400',
-].join(' ')
+const hoverLift = { y: -4, transition: { duration: 0.2 } }
+const tapPress = { scale: 0.99, transition: { duration: 0.1 } }
 
-const tileToneClass = {
-  default:
-    'border-neutral-800 bg-neutral-900/40 hover:border-neutral-600 hover:bg-neutral-900',
-  highlighted:
-    'border-amber-400/80 bg-amber-400/10 hover:border-amber-300 hover:bg-amber-400/15',
+function tileClass(highlighted?: boolean) {
+  return [
+    'group relative isolate flex min-h-28 flex-col overflow-hidden rounded-2xl border px-5 py-4 text-left',
+    'shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05),0_24px_48px_-32px_rgba(0,0,0,1)]',
+    'transition-colors duration-300',
+    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400',
+    highlighted
+      ? 'border-amber-400/30 bg-amber-400/[0.06] hover:border-amber-300/50 sm:col-span-2'
+      : 'border-white/10 bg-white/[0.03] hover:border-white/20',
+  ].join(' ')
 }
 
-function isConfigured(
-  link: HubLink,
-): link is Extract<HubLink, { href: string }> {
+function isConfigured(link: HubLink): link is ConfiguredLink {
   return 'href' in link
 }
 
@@ -76,37 +79,66 @@ function useTransientMessage(durationMs = messageDurationMs) {
   return [current?.text ?? null, show] as const
 }
 
-function TileCaption({ label, title, handle }: LinkCopy) {
-  return (
-    <>
-      <span className="block text-xs tracking-[0.15em] text-neutral-400 uppercase">
-        {label}
-      </span>
-      <span className="mt-auto block pt-6 text-lg font-medium">{title}</span>
-      {handle ? (
-        <span className="block text-sm text-neutral-400">{handle}</span>
-      ) : null}
-    </>
+/** Highlight that tracks the pointer across a single tile. */
+function useSpotlight() {
+  const x = useMotionValue(-400)
+  const y = useMotionValue(-400)
+  const background = useMotionTemplate`radial-gradient(280px circle at ${x}px ${y}px, rgba(255,255,255,0.10), transparent 70%)`
+
+  const onPointerMove = useCallback(
+    (event: PointerEvent<HTMLElement>) => {
+      const bounds = event.currentTarget.getBoundingClientRect()
+      x.set(event.clientX - bounds.left)
+      y.set(event.clientY - bounds.top)
+    },
+    [x, y],
   )
+
+  return { background, onPointerMove }
 }
 
-function TileBackdrop({ art, wide }: { art: TileArt; wide?: boolean }) {
+function TileSurface({
+  art,
+  wide,
+  spotlight,
+}: {
+  art: TileArt
+  wide?: boolean
+  spotlight: MotionValue<string>
+}) {
   return (
     <span
       aria-hidden="true"
-      className="pointer-events-none absolute inset-0 -z-10"
+      className="pointer-events-none absolute inset-0 -z-10 overflow-hidden rounded-2xl"
     >
       <span
-        className="absolute inset-0 opacity-80 transition-opacity duration-300 group-hover:opacity-100"
-        style={{ backgroundImage: art.tint }}
+        className="absolute -right-14 -bottom-16 size-48 rounded-full opacity-70 blur-3xl transition-opacity duration-500 group-hover:opacity-100"
+        style={{ backgroundColor: art.glow }}
       />
       <span
-        className={`absolute top-1/2 -right-6 size-24 -translate-y-1/2 text-neutral-100 opacity-[0.07] transition duration-300 group-hover:scale-110 group-hover:opacity-[0.15] lg:size-32 ${
-          wide ? 'lg:size-44' : ''
+        className={`absolute -right-8 -bottom-10 size-32 text-neutral-50 opacity-[0.06] transition duration-500 group-hover:scale-110 group-hover:opacity-[0.11] lg:size-40 ${
+          wide ? 'lg:size-56' : ''
         }`}
       >
         {art.glyph}
       </span>
+      <motion.span
+        className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        style={{ background: spotlight }}
+      />
+      <span className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
+    </span>
+  )
+}
+
+function TileChip({ art }: { art: TileArt }) {
+  return (
+    <span
+      aria-hidden="true"
+      className="flex size-9 items-center justify-center rounded-xl border border-white/10 bg-white/[0.06] p-2 transition duration-300 group-hover:border-white/20 group-hover:bg-white/10"
+      style={{ color: art.accent }}
+    >
+      {art.glyph}
     </span>
   )
 }
@@ -115,9 +147,27 @@ function TileArrow() {
   return (
     <span
       aria-hidden="true"
-      className="pointer-events-none absolute top-3 right-4 text-neutral-600 transition duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-neutral-300"
+      className="text-neutral-600 transition duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-neutral-200"
     >
       ↗
+    </span>
+  )
+}
+
+function TileCaption({ label, title, handle }: LinkCopy) {
+  return (
+    <span className="mt-auto block pt-8">
+      <span className="block text-[0.7rem] tracking-[0.18em] text-neutral-500 uppercase">
+        {label}
+      </span>
+      <span className="mt-1 block text-lg font-medium text-neutral-50">
+        {title}
+      </span>
+      {handle ? (
+        <span className="mt-0.5 block font-mono text-xs text-neutral-400">
+          {handle}
+        </span>
+      ) : null}
     </span>
   )
 }
@@ -138,12 +188,90 @@ function StatusMessage({
       transition={{ duration: 0.2 }}
       className={
         tone === 'amber'
-          ? 'absolute top-3 right-4 text-sm text-amber-300'
-          : 'absolute top-3 right-4 text-sm text-emerald-400'
+          ? 'absolute top-4 right-5 rounded-full border border-amber-400/30 bg-amber-400/10 px-2.5 py-1 text-xs text-amber-200'
+          : 'absolute top-4 right-5 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-1 text-xs text-emerald-200'
       }
     >
       {children}
     </motion.span>
+  )
+}
+
+function LinkTile({
+  link,
+  copy,
+  onActivate,
+}: {
+  link: ConfiguredLink
+  copy: LinkCopy
+  onActivate: () => void
+}) {
+  const spotlight = useSpotlight()
+  const art = tileArt[link.id]
+  const external = link.href.startsWith('http')
+
+  return (
+    <motion.a
+      variants={itemVariants}
+      whileHover={hoverLift}
+      whileTap={tapPress}
+      href={link.href}
+      {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+      aria-label={controlLabel(copy)}
+      data-highlighted={link.highlighted ? 'true' : undefined}
+      className={tileClass(link.highlighted)}
+      onPointerMove={spotlight.onPointerMove}
+      onClick={onActivate}
+    >
+      <TileSurface
+        art={art}
+        wide={link.highlighted}
+        spotlight={spotlight.background}
+      />
+      <span className="flex items-start justify-between gap-3">
+        <TileChip art={art} />
+        <TileArrow />
+      </span>
+      <TileCaption {...copy} />
+    </motion.a>
+  )
+}
+
+function ButtonTile({
+  art,
+  copy,
+  message,
+  tone,
+  onActivate,
+}: {
+  art: TileArt
+  copy: LinkCopy
+  message: string | null
+  tone: 'amber' | 'emerald'
+  onActivate: () => void
+}) {
+  const spotlight = useSpotlight()
+
+  return (
+    <motion.button
+      variants={itemVariants}
+      whileHover={hoverLift}
+      whileTap={tapPress}
+      type="button"
+      aria-label={controlLabel(copy)}
+      className={tileClass()}
+      onPointerMove={spotlight.onPointerMove}
+      onClick={onActivate}
+    >
+      <TileSurface art={art} spotlight={spotlight.background} />
+      <span className="flex items-start justify-between gap-3">
+        <TileChip art={art} />
+      </span>
+      <TileCaption {...copy} />
+      <AnimatePresence>
+        {message ? <StatusMessage tone={tone}>{message}</StatusMessage> : null}
+      </AnimatePresence>
+    </motion.button>
   )
 }
 
@@ -183,6 +311,7 @@ export function LinkHubPage({
   const [photosMessage, showPhotosMessage] = useTransientMessage()
   const [copyFeedback, showCopyFeedback] = useTransientMessage()
   const copyAction = locale.actions[copyUrlActionId]
+  const photosCopy = locale.links.photos
 
   useEffect(() => {
     analytics.track({ type: 'visit' })
@@ -208,49 +337,65 @@ export function LinkHubPage({
         initial="hidden"
         animate="visible"
         variants={pageVariants}
-        className="flex min-h-dvh flex-col bg-neutral-950 text-neutral-50 lg:h-dvh"
+        className="relative flex min-h-dvh flex-col bg-neutral-950 text-neutral-50 lg:h-dvh"
       >
-        <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-10 px-6 py-12 lg:min-h-0 lg:gap-8 lg:px-10 lg:py-10">
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 overflow-hidden"
+        >
+          <span className="absolute -top-40 -left-24 size-[34rem] rounded-full bg-amber-500/[0.07] blur-[140px]" />
+          <span className="absolute top-1/3 -right-40 size-[30rem] rounded-full bg-indigo-500/[0.08] blur-[140px]" />
+          <span className="absolute inset-0 opacity-[0.18] [background-image:radial-gradient(rgba(255,255,255,0.14)_1px,transparent_1px)] [background-size:22px_22px] [mask-image:radial-gradient(ellipse_at_center,black,transparent_72%)]" />
+        </span>
+
+        <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col gap-10 px-6 py-12 lg:min-h-0 lg:gap-8 lg:px-10 lg:py-10">
           <motion.section
             aria-label="Identity"
             variants={groupVariants}
             className="flex shrink-0 flex-col gap-8 md:flex-row md:items-center md:justify-between md:gap-12"
           >
-            <div className="flex min-w-0 flex-1 flex-col gap-4 lg:gap-3">
+            <div className="flex min-w-0 flex-1 flex-col items-start gap-4 lg:gap-3">
               <motion.p
                 variants={itemVariants}
-                className="text-sm font-medium tracking-[0.2em] text-amber-400 uppercase"
+                className="inline-flex items-center rounded-full border border-amber-400/25 bg-amber-400/10 px-3 py-1 text-xs font-medium tracking-[0.18em] text-amber-300 uppercase"
               >
                 {identity.role}
               </motion.p>
               <motion.h1
                 variants={itemVariants}
-                className="text-4xl font-semibold tracking-tight md:text-5xl lg:text-6xl"
+                className="bg-gradient-to-b from-white to-neutral-400 bg-clip-text text-4xl font-semibold tracking-tight text-transparent md:text-5xl lg:text-6xl"
               >
                 {identity.displayName}
               </motion.h1>
               <motion.p
                 variants={itemVariants}
-                className="max-w-prose text-lg text-neutral-300"
+                className="max-w-prose text-lg text-neutral-400"
               >
                 {identity.bio}
               </motion.p>
               <motion.p
                 variants={itemVariants}
-                className="flex items-center gap-2 text-sm font-medium text-emerald-400"
+                className="inline-flex items-center gap-2 rounded-full border border-emerald-400/25 bg-emerald-400/10 px-3 py-1 text-sm font-medium text-emerald-300"
               >
                 <AvailabilityPulse />
                 {identity.availability}
               </motion.p>
             </div>
 
-            <motion.div variants={itemVariants} className="shrink-0">
+            <motion.div
+              variants={itemVariants}
+              className="relative shrink-0 self-center"
+            >
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute -inset-6 rounded-full bg-amber-500/10 blur-3xl"
+              />
               <img
                 src={portraitSrc}
                 alt={identity.portraitAlt}
                 width={320}
                 height={320}
-                className="size-64 rounded-sm object-cover md:size-72 lg:size-[clamp(11rem,26vh,20rem)]"
+                className="relative size-64 rounded-2xl object-cover shadow-[0_40px_80px_-40px_rgba(0,0,0,1)] ring-1 ring-white/10 md:size-72 lg:size-[clamp(11rem,26vh,20rem)]"
               />
             </motion.div>
           </motion.section>
@@ -260,91 +405,39 @@ export function LinkHubPage({
             className="grid flex-1 auto-rows-fr grid-cols-1 gap-3 sm:grid-cols-2 lg:min-h-0 lg:grid-cols-4"
           >
             <section aria-label="Links" className="contents">
-              {hubLinks.map((link) => {
-                if (isConfigured(link)) {
-                  const copy = locale.links[link.id]
-                  const external = link.href.startsWith('http')
-
-                  return (
-                    <motion.a
-                      key={link.id}
-                      variants={itemVariants}
-                      whileHover={{ y: -3, transition: { duration: 0.18 } }}
-                      whileTap={{ scale: 0.99, transition: { duration: 0.1 } }}
-                      href={link.href}
-                      {...(external
-                        ? { target: '_blank', rel: 'noopener noreferrer' }
-                        : {})}
-                      aria-label={controlLabel(copy)}
-                      data-highlighted={link.highlighted ? 'true' : undefined}
-                      className={`${tileClass} ${
-                        link.highlighted
-                          ? `${tileToneClass.highlighted} sm:col-span-2`
-                          : tileToneClass.default
-                      }`}
-                      onClick={() => {
-                        analytics.track({ type: 'link_click', linkId: link.id })
-                      }}
-                    >
-                      <TileBackdrop
-                        art={tileArt[link.id]}
-                        wide={link.highlighted}
-                      />
-                      <TileCaption {...copy} />
-                      <TileArrow />
-                    </motion.a>
-                  )
-                }
-
-                const copy = locale.links.photos
-                return (
-                  <motion.button
+              {hubLinks.map((link) =>
+                isConfigured(link) ? (
+                  <LinkTile
                     key={link.id}
-                    variants={itemVariants}
-                    whileHover={{ y: -3, transition: { duration: 0.18 } }}
-                    whileTap={{ scale: 0.99, transition: { duration: 0.1 } }}
-                    type="button"
-                    aria-label={controlLabel(copy)}
-                    className={`${tileClass} ${tileToneClass.default}`}
-                    onClick={() => showPhotosMessage(copy.comingSoon)}
-                  >
-                    <TileBackdrop art={tileArt.photos} />
-                    <TileCaption label={copy.label} title={copy.title} />
-                    <AnimatePresence>
-                      {photosMessage ? (
-                        <StatusMessage tone="amber">
-                          {photosMessage}
-                        </StatusMessage>
-                      ) : null}
-                    </AnimatePresence>
-                  </motion.button>
-                )
-              })}
+                    link={link}
+                    copy={locale.links[link.id]}
+                    onActivate={() =>
+                      analytics.track({ type: 'link_click', linkId: link.id })
+                    }
+                  />
+                ) : (
+                  <ButtonTile
+                    key={link.id}
+                    art={tileArt.photos}
+                    copy={{ label: photosCopy.label, title: photosCopy.title }}
+                    message={photosMessage}
+                    tone="amber"
+                    onActivate={() => showPhotosMessage(photosCopy.comingSoon)}
+                  />
+                ),
+              )}
             </section>
 
             <section aria-label="Actions" className="contents">
-              <motion.button
-                variants={itemVariants}
-                whileHover={{ y: -3, transition: { duration: 0.18 } }}
-                whileTap={{ scale: 0.99, transition: { duration: 0.1 } }}
-                type="button"
-                aria-label={controlLabel(copyAction)}
-                className={`${tileClass} ${tileToneClass.default}`}
-                onClick={() => {
+              <ButtonTile
+                art={tileArt[copyUrlActionId]}
+                copy={{ label: copyAction.label, title: copyAction.title }}
+                message={copyFeedback}
+                tone="emerald"
+                onActivate={() => {
                   void copyHubUrl()
                 }}
-              >
-                <TileBackdrop art={tileArt[copyUrlActionId]} />
-                <TileCaption
-                  label={copyAction.label}
-                  title={copyAction.title}
-                />
-                <AnimatePresence>
-                  {copyFeedback ? (
-                    <StatusMessage tone="emerald">{copyFeedback}</StatusMessage>
-                  ) : null}
-                </AnimatePresence>
-              </motion.button>
+              />
             </section>
           </motion.div>
         </div>
