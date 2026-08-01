@@ -36,6 +36,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     <html lang="en">
       <head>
         <HeadContent />
+        {/* Entrance animation is server-rendered as opacity:0; without scripts
+            nothing would ever animate it back in. */}
+        <noscript>
+          <style>{`[style*="opacity:0"] { opacity: 1 !important; transform: none !important; }`}</style>
+        </noscript>
       </head>
       <body>
         {children}
