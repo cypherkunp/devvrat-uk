@@ -87,6 +87,13 @@ describe('Link Hub page', () => {
     })
     expect(central.getAttribute('href')).toBe('https://devvrat.cc')
     expect(central.getAttribute('data-highlighted')).toBe('true')
+
+    const handbook = screen.getByRole('link', {
+      name: `${locale.links.handbook.label}: ${locale.links.handbook.title}`,
+    })
+    expect(handbook.getAttribute('href')).toBe(
+      'https://www.devvrat.cc/posts/handbook',
+    )
   })
 
   it('shows Photos coming soon in-page and does not navigate away', async () => {

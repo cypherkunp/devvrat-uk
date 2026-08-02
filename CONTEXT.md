@@ -23,6 +23,7 @@ An outbound destination shown as a tile on the Link Hub (label, title, optional 
 - LinkedIn → `https://www.linkedin.com/in/devvratshukla`
 - GitHub → `https://github.com/cypherkunp`
 - Central Hub → `https://devvrat.cc`
+- Handbook → `https://www.devvrat.cc/posts/handbook`
 - Photos → destination deferred; placeholder “coming soon” click (no outbound navigation, no link_click)
 _Avoid_: Card, button, social (as the noun for one entry)
 

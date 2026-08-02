@@ -1,5 +1,11 @@
 export type LinkId =
-  'email' | 'twitter' | 'linkedin' | 'github' | 'central-hub' | 'photos'
+  | 'email'
+  | 'twitter'
+  | 'linkedin'
+  | 'github'
+  | 'central-hub'
+  | 'handbook'
+  | 'photos'
 
 export type ConfiguredLink = {
   id: Exclude<LinkId, 'photos'>
@@ -23,5 +29,6 @@ export const hubLinks: HubLink[] = [
   { id: 'linkedin', href: 'https://www.linkedin.com/in/devvratshukla' },
   { id: 'github', href: 'https://github.com/cypherkunp' },
   { id: 'central-hub', href: 'https://devvrat.cc', highlighted: true },
+  { id: 'handbook', href: 'https://www.devvrat.cc/posts/handbook' },
   { id: 'photos' },
 ]

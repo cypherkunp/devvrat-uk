@@ -32,6 +32,7 @@ export type Locale = {
     linkedin: LinkCopy
     github: LinkCopy
     'central-hub': LinkCopy
+    handbook: LinkCopy
     photos: PhotosCopy
   }
   actions: {

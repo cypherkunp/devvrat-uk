@@ -32,6 +32,11 @@
       "title": "Primary site",
       "handle": "devvrat.cc"
     },
+    "handbook": {
+      "label": "Handbook",
+      "title": "Devvrat's Handbook",
+      "handle": "devvrat.cc/posts/handbook"
+    },
     "photos": {
       "label": "Photos",
       "title": "Gallery",
