@@ -11,7 +11,7 @@ import type { MotionValue, Variants } from 'motion/react'
 import type { PointerEvent } from 'react'
 
 import type { AnalyticsPort } from '#/analytics/port'
-import { copyUrlActionId, hubLinks } from '#/content/hub-config'
+import { copyUrlActionId, hubLinks, monoActionId } from '#/content/hub-config'
 import type { ConfiguredLink, HubLink } from '#/content/hub-config'
 import type { LinkCopy, Locale } from '#/content/locale'
 import { portraitAscii, portraitAsciiColumns } from '#/link-hub/portrait-ascii'
@@ -312,6 +312,72 @@ function ButtonTile({
   )
 }
 
+function HudSwitch({ on }: { on: boolean }) {
+  return (
+    <span
+      aria-hidden="true"
+      className="relative h-5 w-9 shrink-0 border transition duration-300"
+      style={{
+        clipPath: chipCut,
+        color: on ? '#f4f4f5' : '#71717a',
+        borderColor: on ? 'rgba(244,244,245,0.55)' : 'rgba(113,113,122,0.45)',
+        backgroundColor: on ? 'rgba(244,244,245,0.18)' : 'rgba(113,113,122,0.12)',
+        boxShadow: on ? '0 0 18px -6px rgba(244,244,245,0.7)' : undefined,
+      }}
+    >
+      <span
+        className="absolute top-0.5 size-3.5 bg-current transition-transform duration-300"
+        style={{
+          clipPath: chipCut,
+          transform: on ? 'translateX(18px)' : 'translateX(2px)',
+          boxShadow: '0 0 10px currentColor',
+        }}
+      />
+    </span>
+  )
+}
+
+function SwitchTile({
+  art,
+  copy,
+  checked,
+  onCheckedChange,
+}: {
+  art: TileArt
+  copy: LinkCopy
+  checked: boolean
+  onCheckedChange: (next: boolean) => void
+}) {
+  const spotlight = useSpotlight()
+
+  return (
+    <motion.button
+      variants={itemVariants}
+      whileHover={hoverLift}
+      whileTap={tapPress}
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      aria-label={controlLabel(copy)}
+      className={tileClass()}
+      onPointerMove={spotlight.onPointerMove}
+      onClick={() => onCheckedChange(!checked)}
+    >
+      <TileSurface art={art} spotlight={spotlight.background} />
+      <span className="flex items-center gap-3">
+        <TileChip art={art} />
+        <TileLabel label={copy.label} />
+      </span>
+      <span className="mt-auto flex items-end justify-between gap-3 pt-5">
+        <span className="block text-base font-medium tracking-tight text-slate-50">
+          {copy.title}
+        </span>
+        <HudSwitch on={checked} />
+      </span>
+    </motion.button>
+  )
+}
+
 /* A monospace cell is ~0.6em wide, so the grid spans this many ems; sizing the
    font off the container width makes the art fill the frame at any breakpoint.
    The extra 0.4 is slack for mono faces whose advance runs a hair over 0.6em. */
@@ -435,7 +501,9 @@ export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
   const { identity } = locale
   const [photosMessage, showPhotosMessage] = useTransientMessage()
   const [copyFeedback, showCopyFeedback] = useTransientMessage()
+  const [monochrome, setMonochrome] = useState(false)
   const copyAction = locale.actions[copyUrlActionId]
+  const monoAction = locale.actions[monoActionId]
   const photosCopy = locale.links.photos
 
   useEffect(() => {
@@ -453,6 +521,11 @@ export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
     analytics.track({ type: 'action_click', actionId: copyUrlActionId })
   }
 
+  function toggleMonochrome(next: boolean) {
+    setMonochrome(next)
+    analytics.track({ type: 'action_click', actionId: monoActionId })
+  }
+
   return (
     <MotionConfig
       reducedMotion="user"
@@ -462,6 +535,7 @@ export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
         initial="hidden"
         animate="visible"
         variants={pageVariants}
+        data-mono={monochrome ? 'true' : undefined}
         className="relative flex min-h-dvh flex-col bg-black text-slate-50 lg:h-dvh"
       >
         <span
@@ -562,6 +636,12 @@ export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
                 onActivate={() => {
                   void copyHubUrl()
                 }}
+              />
+              <SwitchTile
+                art={tileArt[monoActionId]}
+                copy={{ label: monoAction.label, title: monoAction.title }}
+                checked={monochrome}
+                onCheckedChange={toggleMonochrome}
               />
             </section>
           </motion.div>

@@ -19,9 +19,10 @@ export type PlaceholderLink = {
 
 export type HubLink = ConfiguredLink | PlaceholderLink
 
-export type ActionId = 'copy-url'
+export type ActionId = 'copy-url' | 'mono'
 
-export const copyUrlActionId: ActionId = 'copy-url'
+export const copyUrlActionId = 'copy-url' as const satisfies ActionId
+export const monoActionId = 'mono' as const satisfies ActionId
 
 export const hubLinks: HubLink[] = [
   { id: 'email', href: 'mailto:devvrat.shukla@gmail.com' },
