@@ -1,3 +1,4 @@
 # https://www.robotstxt.org/robotstxt.html
+# Public Link Hub — index the page; nothing else to hide.
 User-agent: *
-Disallow:
+Allow: /

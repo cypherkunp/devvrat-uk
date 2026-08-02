@@ -1,11 +1,16 @@
+import { lazy, Suspense } from 'react'
 import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
 
 import { loadLocale } from '#/content/locale'
 import appCss from '../styles.css?url'
 
 const locale = loadLocale('en')
+
+const AppDevtools = import.meta.env.DEV
+  ? lazy(() =>
+      import('#/devtools').then((m) => ({ default: m.AppDevtools })),
+    )
+  : null
 
 export const Route = createRootRoute({
   head: () => ({
@@ -20,11 +25,33 @@ export const Route = createRootRoute({
       {
         title: locale.meta.documentTitle,
       },
+      {
+        name: 'theme-color',
+        content: '#0a0a0a',
+      },
     ],
     links: [
       {
         rel: 'stylesheet',
         href: appCss,
+      },
+      {
+        rel: 'icon',
+        href: '/favicon.svg',
+        type: 'image/svg+xml',
+      },
+      {
+        rel: 'icon',
+        href: '/favicon.ico',
+        sizes: '48x48',
+      },
+      {
+        rel: 'apple-touch-icon',
+        href: '/logo192.png',
+      },
+      {
+        rel: 'manifest',
+        href: '/manifest.json',
       },
     ],
   }),
@@ -44,17 +71,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         {children}
-        <TanStackDevtools
-          config={{
-            position: 'bottom-right',
-          }}
-          plugins={[
-            {
-              name: 'Tanstack Router',
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-          ]}
-        />
+        {AppDevtools ? (
+          <Suspense fallback={null}>
+            <AppDevtools />
+          </Suspense>
+        ) : null}
         <Scripts />
       </body>
     </html>

@@ -23,17 +23,23 @@ describe('GA4 analytics adapter', () => {
     })
   })
 
-  it('configures GA4 with the Measurement ID from the environment', () => {
+  it('defers GA4 script load and config until the first track', () => {
     const gtag = vi.fn()
     const loadScript = vi.fn()
 
-    createGa4Analytics({
+    const analytics = createGa4Analytics({
       measurementId: 'G-ENV456',
       gtag,
       loadScript,
     })
 
+    expect(loadScript).not.toHaveBeenCalled()
+    expect(gtag).not.toHaveBeenCalled()
+
+    analytics.track({ type: 'visit' })
+
     expect(loadScript).toHaveBeenCalledWith('G-ENV456')
     expect(gtag).toHaveBeenCalledWith('config', 'G-ENV456')
+    expect(gtag).toHaveBeenCalledWith('event', 'visit')
   })
 })

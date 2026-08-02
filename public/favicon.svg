@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Devvrat">
+  <rect width="32" height="32" rx="6" fill="#050508"/>
+  <!-- faint HUD grid -->
+  <path
+    d="M4 10.5h24M4 16h24M4 21.5h24M10.5 4v24M16 4v24M21.5 4v24"
+    stroke="#22d3ee"
+    stroke-opacity="0.12"
+    stroke-width="0.5"
+  />
+  <!-- chromatic shadow (magenta) -->
+  <path
+    d="M9.2 7.2h7.1c4.9 0 8.2 3.1 8.2 8.8s-3.3 8.8-8.2 8.8H9.2V7.2zm3.1 3.1v11.4h4c2.9 0 4.9-1.9 4.9-5.7s-2-5.7-4.9-5.7h-4z"
+    fill="#ff2fd0"
+    opacity="0.85"
+    transform="translate(1.1 -0.7)"
+  />
+  <!-- primary glyph (cyan) -->
+  <path
+    d="M9.2 7.2h7.1c4.9 0 8.2 3.1 8.2 8.8s-3.3 8.8-8.2 8.8H9.2V7.2zm3.1 3.1v11.4h4c2.9 0 4.9-1.9 4.9-5.7s-2-5.7-4.9-5.7h-4z"
+    fill="#22d3ee"
+  />
+  <!-- glitch slice -->
+  <rect x="7" y="14.6" width="18" height="1.4" fill="#050508" opacity="0.55"/>
+  <path
+    d="M9.2 7.2h7.1c4.9 0 8.2 3.1 8.2 8.8s-3.3 8.8-8.2 8.8H9.2V7.2zm3.1 3.1v11.4h4c2.9 0 4.9-1.9 4.9-5.7s-2-5.7-4.9-5.7h-4z"
+    fill="#ff2fd0"
+    opacity="0.55"
+    clip-path="inset(52% 0 0 0)"
+    transform="translate(-0.9 0.6)"
+  />
+</svg>

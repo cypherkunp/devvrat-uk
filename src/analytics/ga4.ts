@@ -68,19 +68,26 @@ export function createGa4Analytics({
   gtag: injectedGtag,
   loadScript = defaultLoadScript,
 }: CreateGa4AnalyticsOptions): AnalyticsPort {
-  let gtag: GtagFn
+  // Lazy: gtag.js only loads on first track (visit runs post-hydration).
+  let gtag: GtagFn | undefined
 
-  if (injectedGtag) {
-    loadScript(measurementId)
-    injectedGtag('config', measurementId)
-    gtag = injectedGtag
-  } else {
-    gtag = ensureGtag(measurementId, loadScript)
+  function resolveGtag(): GtagFn {
+    if (gtag) return gtag
+
+    if (injectedGtag) {
+      loadScript(measurementId)
+      injectedGtag('config', measurementId)
+      gtag = injectedGtag
+    } else {
+      gtag = ensureGtag(measurementId, loadScript)
+    }
+
+    return gtag
   }
 
   return {
     track(event) {
-      gtag(...toGtagArgs(event))
+      resolveGtag()(...toGtagArgs(event))
     },
   }
 }
