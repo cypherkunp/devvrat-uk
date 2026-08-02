@@ -34,7 +34,6 @@ function renderPage() {
     <LinkHubPage
       locale={locale}
       analytics={analytics}
-      portraitSrc="/portrait.jpg"
       hubUrl="https://devvrat.uk"
     />,
   )

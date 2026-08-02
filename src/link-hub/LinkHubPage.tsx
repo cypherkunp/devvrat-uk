@@ -14,13 +14,13 @@ import type { AnalyticsPort } from '#/analytics/port'
 import { copyUrlActionId, hubLinks } from '#/content/hub-config'
 import type { ConfiguredLink, HubLink } from '#/content/hub-config'
 import type { LinkCopy, Locale } from '#/content/locale'
+import { portraitAscii, portraitAsciiColumns } from '#/link-hub/portrait-ascii'
 import { tileArt } from '#/link-hub/tile-art'
 import type { TileArt } from '#/link-hub/tile-art'
 
 export type LinkHubPageProps = {
   locale: Locale
   analytics: AnalyticsPort
-  portraitSrc: string
   hubUrl: string
 }
 
@@ -60,7 +60,7 @@ function tileClass(highlighted?: boolean) {
   return [
     // The chamfer lives on the surface behind the control, so the focus ring
     // stays a full un-clipped rectangle.
-    'group relative isolate flex min-h-28 flex-col px-5 py-4 text-left',
+    'group relative isolate flex min-h-24 flex-col px-4 py-3.5 text-left',
     'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300',
     highlighted ? 'sm:col-span-2' : '',
   ].join(' ')
@@ -124,23 +124,16 @@ function TileSurface({
       {/* Edge and fill are two chamfered layers a pixel apart, which is what
           draws the neon outline along the sliced corners. */}
       <span
-        className="absolute inset-0 opacity-55 transition-opacity duration-300 group-hover:opacity-100"
-        style={{
-          clipPath: tileCut,
-          background: `linear-gradient(135deg, ${art.accent} 0%, ${art.accent}44 35%, rgba(148,163,184,0.14) 62%, ${art.accent}cc 100%)`,
-        }}
+        className="absolute inset-0 opacity-75 transition-opacity duration-300 group-hover:opacity-100"
+        style={{ clipPath: tileCut, backgroundColor: art.accent }}
       />
       <span
-        className="absolute inset-px overflow-hidden bg-[#070a14]"
+        className="absolute inset-px overflow-hidden bg-black"
         style={{ clipPath: tileCut }}
       >
         <span
-          className="absolute -right-16 -bottom-20 size-52 rounded-full opacity-70 blur-[64px] transition-opacity duration-500 group-hover:opacity-100"
-          style={{ backgroundColor: art.glow }}
-        />
-        <span
-          className={`absolute -right-8 -bottom-10 size-32 opacity-[0.09] transition duration-500 group-hover:scale-110 group-hover:opacity-25 lg:size-40 ${
-            wide ? 'lg:size-56' : ''
+          className={`absolute -right-8 -bottom-10 size-28 opacity-[0.09] transition duration-500 group-hover:scale-110 group-hover:opacity-25 lg:size-32 ${
+            wide ? 'lg:size-44' : ''
           }`}
           style={{ color: art.accent }}
         >
@@ -166,11 +159,11 @@ function TileChip({ art }: { art: TileArt }) {
   return (
     <span
       aria-hidden="true"
-      className="flex size-9 items-center justify-center border p-2 transition duration-300"
+      className="flex size-8 shrink-0 items-center justify-center border p-1.5 transition duration-300"
       style={{
         clipPath: chipCut,
         color: art.accent,
-        borderColor: `${art.accent}59`,
+        borderColor: `${art.accent}8c`,
         backgroundColor: `${art.accent}14`,
         boxShadow: `0 0 22px -8px ${art.accent}`,
       }}
@@ -184,20 +177,26 @@ function TileArrow() {
   return (
     <span
       aria-hidden="true"
-      className="font-mono text-slate-600 transition duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-cyan-300"
+      className="shrink-0 font-mono text-slate-600 transition duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-cyan-300"
     >
       ↗
     </span>
   )
 }
 
-function TileCaption({ label, title, handle }: LinkCopy) {
+/** Sits beside the chip so the tile's top row reads as one label strip. */
+function TileLabel({ label }: Pick<LinkCopy, 'label'>) {
   return (
-    <span className="mt-auto block pt-8">
-      <span className="hud-tag block font-mono text-[0.65rem] tracking-[0.3em] text-cyan-300/70 uppercase">
-        {label}
-      </span>
-      <span className="mt-1 block text-lg font-medium tracking-tight text-slate-50">
+    <span className="hud-tag min-w-0 flex-1 truncate font-mono text-[0.6rem] tracking-[0.3em] text-cyan-300/70 uppercase">
+      {label}
+    </span>
+  )
+}
+
+function TileCaption({ title, handle }: Omit<LinkCopy, 'label'>) {
+  return (
+    <span className="mt-auto block pt-5">
+      <span className="block text-base font-medium tracking-tight text-slate-50">
         {title}
       </span>
       {handle ? (
@@ -226,7 +225,7 @@ function StatusMessage({ children, tone }: { children: string; tone: Tone }) {
       exit={{ opacity: 0, y: -6 }}
       transition={{ duration: 0.2 }}
       style={{ clipPath: chipCut }}
-      className={`hud-brackets absolute top-4 right-5 border px-2.5 py-1 font-mono text-[0.65rem] tracking-[0.16em] uppercase ${toneClass[tone]}`}
+      className={`hud-brackets absolute right-4 bottom-3 border px-2.5 py-1 font-mono text-[0.65rem] tracking-[0.16em] uppercase ${toneClass[tone]}`}
     >
       {children}
     </motion.span>
@@ -264,11 +263,12 @@ function LinkTile({
         wide={link.highlighted}
         spotlight={spotlight.background}
       />
-      <span className="flex items-start justify-between gap-3">
+      <span className="flex items-center gap-3">
         <TileChip art={art} />
+        <TileLabel label={copy.label} />
         <TileArrow />
       </span>
-      <TileCaption {...copy} />
+      <TileCaption title={copy.title} handle={copy.handle} />
     </motion.a>
   )
 }
@@ -300,14 +300,88 @@ function ButtonTile({
       onClick={onActivate}
     >
       <TileSurface art={art} spotlight={spotlight.background} />
-      <span className="flex items-start justify-between gap-3">
+      <span className="flex items-center gap-3">
         <TileChip art={art} />
+        <TileLabel label={copy.label} />
       </span>
-      <TileCaption {...copy} />
+      <TileCaption title={copy.title} handle={copy.handle} />
       <AnimatePresence>
         {message ? <StatusMessage tone={tone}>{message}</StatusMessage> : null}
       </AnimatePresence>
     </motion.button>
+  )
+}
+
+/* A monospace cell is ~0.6em wide, so the grid spans this many ems; sizing the
+   font off the container width makes the art fill the frame at any breakpoint.
+   The extra 0.4 is slack for mono faces whose advance runs a hair over 0.6em. */
+const asciiWidthEm = portraitAsciiColumns * 0.6 + 0.4
+
+function AsciiPortrait({ alt }: { alt: string }) {
+  return (
+    <span
+      role="img"
+      aria-label={alt}
+      className="@container relative isolate block size-64 overflow-hidden bg-black md:size-72 lg:size-[clamp(11rem,24vh,18rem)]"
+      style={{ clipPath: frameCut }}
+    >
+      {/* Gradient-through-the-glyphs plus a drop shadow: the shadow follows the
+          clipped text rather than the box, which is what makes it read as neon. */}
+      <pre
+        aria-hidden="true"
+        className="m-0 bg-gradient-to-b from-cyan-300 via-violet-400 to-fuchsia-400 bg-clip-text font-mono text-transparent [filter:drop-shadow(0_0_5px_rgba(34,211,238,0.35))_drop-shadow(0_0_18px_rgba(255,47,208,0.25))]"
+        style={{
+          fontSize: `calc(100cqw / ${asciiWidthEm})`,
+          lineHeight: 1.14,
+        }}
+      >
+        {portraitAscii}
+      </pre>
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 [background:radial-gradient(circle_at_50%_40%,transparent_45%,rgba(0,0,0,0.75)_100%)]"
+      />
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-black to-transparent"
+      />
+      <span
+        aria-hidden="true"
+        className={`pointer-events-none absolute inset-0 opacity-60 ${scanlines}`}
+      />
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute top-2.5 left-2.5 size-5 border-t border-l border-cyan-300/80 shadow-[0_0_12px_-2px_rgba(34,211,238,0.9)]"
+      />
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute right-2.5 bottom-2.5 size-5 border-r border-b border-fuchsia-400/80 shadow-[0_0_12px_-2px_rgba(255,47,208,0.9)]"
+      />
+    </span>
+  )
+}
+
+/** The Identity card's edge: one neon rule around the whole header, drawn the
+    same two-layer way as the tiles but graded across the three hub colours. */
+function IdentitySurface() {
+  return (
+    <span
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 -z-10"
+    >
+      <span
+        className="absolute inset-0 opacity-75"
+        style={{
+          clipPath: frameCut,
+          background:
+            'linear-gradient(115deg, #22d3ee 0%, #7c3aed 55%, #ff2fd0 100%)',
+        }}
+      />
+      <span
+        className="absolute inset-px bg-black"
+        style={{ clipPath: frameCut }}
+      />
+    </span>
   )
 }
 
@@ -337,12 +411,7 @@ function AvailabilityPulse() {
   )
 }
 
-export function LinkHubPage({
-  locale,
-  analytics,
-  portraitSrc,
-  hubUrl,
-}: LinkHubPageProps) {
+export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
   const { identity } = locale
   const [photosMessage, showPhotosMessage] = useTransientMessage()
   const [copyFeedback, showCopyFeedback] = useTransientMessage()
@@ -373,25 +442,30 @@ export function LinkHubPage({
         initial="hidden"
         animate="visible"
         variants={pageVariants}
-        className="relative flex min-h-dvh flex-col bg-[#04060d] text-slate-50 lg:h-dvh"
+        className="relative flex min-h-dvh flex-col bg-black text-slate-50 lg:h-dvh"
       >
         <span
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 overflow-hidden"
         >
-          <span className="absolute -top-44 -left-32 size-[38rem] rounded-full bg-fuchsia-600/20 blur-[150px]" />
-          <span className="absolute top-1/4 -right-44 size-[34rem] rounded-full bg-cyan-500/20 blur-[150px]" />
-          <span className="absolute -bottom-72 left-1/3 size-[32rem] rounded-full bg-violet-600/15 blur-[160px]" />
-          <span className="absolute inset-0 opacity-25 [background-image:linear-gradient(rgba(34,211,238,0.16)_1px,transparent_1px),linear-gradient(90deg,rgba(34,211,238,0.12)_1px,transparent_1px)] [background-size:48px_48px] [mask-image:radial-gradient(ellipse_at_center,black,transparent_78%)]" />
+          {/* The page is black; the only colour behind the content is a hint
+              of bleed off the screen edges, so the neon reads as edge-lit. */}
+          <span className="absolute -top-56 -left-48 size-[34rem] rounded-full bg-fuchsia-600/[0.07] blur-[160px]" />
+          <span className="absolute top-1/3 -right-56 size-[30rem] rounded-full bg-cyan-500/[0.07] blur-[160px]" />
+          <span className="absolute inset-0 opacity-15 [background-image:linear-gradient(rgba(34,211,238,0.16)_1px,transparent_1px),linear-gradient(90deg,rgba(34,211,238,0.12)_1px,transparent_1px)] [background-size:48px_48px] [mask-image:radial-gradient(ellipse_at_center,black,transparent_72%)]" />
           <span className={`absolute inset-0 opacity-50 ${scanlines}`} />
         </span>
 
-        <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col gap-10 px-6 py-12 lg:min-h-0 lg:gap-8 lg:px-10 lg:py-10">
+        {/* The tiles no longer stretch to the viewport, so on desktop the
+              whole hub is centred rather than left hanging above dead space. */}
+        <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col gap-10 px-6 py-12 lg:min-h-0 lg:justify-center lg:gap-8 lg:px-10 lg:py-10">
           <motion.section
             aria-label="Identity"
             variants={groupVariants}
-            className="flex shrink-0 flex-col gap-8 md:flex-row md:items-center md:justify-between md:gap-12"
+            className="relative isolate flex shrink-0 flex-col gap-8 px-6 py-8 md:flex-row md:items-center md:justify-between md:gap-12 md:px-10 md:py-8 lg:py-6"
           >
+            <IdentitySurface />
+
             <div className="flex min-w-0 flex-1 flex-col items-start gap-4 lg:gap-3">
               <motion.p
                 variants={itemVariants}
@@ -427,69 +501,13 @@ export function LinkHubPage({
               variants={itemVariants}
               className="relative shrink-0 self-center"
             >
-              <span
-                aria-hidden="true"
-                className="pointer-events-none absolute -inset-10 bg-fuchsia-600/15 blur-[90px]"
-              />
-              {/* Every decoration stays inside the frame box so the portrait
-                  keeps the same right edge as the grid below it. */}
-              <span
-                className="relative block p-px"
-                style={{
-                  clipPath: frameCut,
-                  background:
-                    'linear-gradient(135deg, #22d3ee 0%, #7c3aed 55%, #ff2fd0 100%)',
-                }}
-              >
-                <span
-                  className="relative isolate block overflow-hidden bg-[#04060d]"
-                  style={{ clipPath: frameCut }}
-                >
-                  <img
-                    src={portraitSrc}
-                    alt={identity.portraitAlt}
-                    width={320}
-                    height={320}
-                    className="block size-64 object-cover contrast-[1.05] saturate-[0.9] md:size-72 lg:size-[clamp(11rem,24vh,18rem)]"
-                  />
-                  {/* The neon grade is masked out of the middle so it colours
-                      the backdrop and rim without washing out the face. */}
-                  <span
-                    aria-hidden="true"
-                    className="pointer-events-none absolute inset-0 bg-gradient-to-br from-cyan-400 via-violet-500 to-fuchsia-500 mix-blend-multiply [mask-image:radial-gradient(circle_at_50%_40%,transparent_22%,black_62%)]"
-                  />
-                  <span
-                    aria-hidden="true"
-                    className="pointer-events-none absolute inset-0 bg-gradient-to-br from-[#062c3d] via-[#160446] to-[#31043a] opacity-80 mix-blend-screen [mask-image:radial-gradient(circle_at_50%_40%,transparent_26%,black_70%)]"
-                  />
-                  <span
-                    aria-hidden="true"
-                    className="pointer-events-none absolute inset-0 [background:radial-gradient(circle_at_50%_38%,transparent_46%,rgba(4,6,13,0.7)_100%)]"
-                  />
-                  <span
-                    aria-hidden="true"
-                    className="pointer-events-none absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-[#04060d]/90 to-transparent"
-                  />
-                  <span
-                    aria-hidden="true"
-                    className={`pointer-events-none absolute inset-0 opacity-50 ${scanlines}`}
-                  />
-                  <span
-                    aria-hidden="true"
-                    className="pointer-events-none absolute top-2.5 left-2.5 size-5 border-t border-l border-cyan-300/70"
-                  />
-                  <span
-                    aria-hidden="true"
-                    className="pointer-events-none absolute right-2.5 bottom-2.5 size-5 border-r border-b border-fuchsia-400/70"
-                  />
-                </span>
-              </span>
+              <AsciiPortrait alt={identity.portraitAlt} />
             </motion.div>
           </motion.section>
 
           <motion.div
             variants={groupVariants}
-            className="grid flex-1 auto-rows-fr grid-cols-1 gap-3 sm:grid-cols-2 lg:min-h-0 lg:grid-cols-4"
+            className="grid auto-rows-fr grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4"
           >
             <section aria-label="Links" className="contents">
               {hubLinks.map((link) =>

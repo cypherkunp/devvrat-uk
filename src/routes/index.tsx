@@ -16,12 +16,5 @@ function LinkHubRoute() {
       ? window.location.origin
       : 'https://devvrat.uk'
 
-  return (
-    <LinkHubPage
-      locale={locale}
-      analytics={analytics}
-      portraitSrc="/portrait.jpg"
-      hubUrl={hubUrl}
-    />
-  )
+  return <LinkHubPage locale={locale} analytics={analytics} hubUrl={hubUrl} />
 }
