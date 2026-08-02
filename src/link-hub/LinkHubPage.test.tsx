@@ -46,6 +46,15 @@ describe('Link Hub page', () => {
     expect(screen.queryByRole('button', { name: /^share$/i })).toBeNull()
   })
 
+  it('credits the Owner in a footer landmark outside the main content', () => {
+    const { locale } = renderPage()
+    const footer = screen.getByRole('contentinfo')
+
+    expect(footer.textContent).toContain(locale.footer.credit)
+    expect(footer.textContent).toContain(locale.footer.rights)
+    expect(footer.closest('main')).toBeNull()
+  })
+
   it('routes configured Links to their destinations and highlights Central Hub', () => {
     const { locale } = renderPage()
 

@@ -37,6 +37,10 @@ export type Locale = {
   actions: {
     'copy-url': ActionCopy
   }
+  footer: {
+    credit: string
+    rights: string
+  }
   meta: {
     documentTitle: string
   }

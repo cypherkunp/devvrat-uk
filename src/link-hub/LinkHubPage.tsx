@@ -411,6 +411,26 @@ function AvailabilityPulse() {
   )
 }
 
+/** Sits outside <main> so it reads as the page's contentinfo landmark. */
+function HubFooter({ credit, rights }: Locale['footer']) {
+  return (
+    <motion.footer
+      variants={itemVariants}
+      className="relative z-10 mx-auto flex w-full max-w-6xl shrink-0 flex-wrap items-center justify-center gap-x-3 gap-y-1 px-6 pb-8 font-mono text-[0.65rem] tracking-[0.24em] uppercase lg:px-10 lg:pb-6"
+    >
+      <span className="hud-tag text-cyan-300/60 [text-shadow:0_0_12px_rgba(34,211,238,0.4)]">
+        {credit}
+      </span>
+      <span aria-hidden="true" className="text-slate-700">
+        ::
+      </span>
+      <span className="text-fuchsia-400/60 [text-shadow:0_0_12px_rgba(255,47,208,0.4)]">
+        {rights}
+      </span>
+    </motion.footer>
+  )
+}
+
 export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
   const { identity } = locale
   const [photosMessage, showPhotosMessage] = useTransientMessage()
@@ -438,7 +458,7 @@ export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
       reducedMotion="user"
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
     >
-      <motion.main
+      <motion.div
         initial="hidden"
         animate="visible"
         variants={pageVariants}
@@ -458,7 +478,7 @@ export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
 
         {/* The tiles no longer stretch to the viewport, so on desktop the
               whole hub is centred rather than left hanging above dead space. */}
-        <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col gap-10 px-6 py-12 lg:min-h-0 lg:justify-center lg:gap-8 lg:px-10 lg:py-10">
+        <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col gap-10 px-6 pt-12 pb-8 lg:min-h-0 lg:justify-center lg:gap-8 lg:px-10 lg:pt-10 lg:pb-6">
           <motion.section
             aria-label="Identity"
             variants={groupVariants}
@@ -545,8 +565,10 @@ export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
               />
             </section>
           </motion.div>
-        </div>
-      </motion.main>
+        </main>
+
+        <HubFooter credit={locale.footer.credit} rights={locale.footer.rights} />
+      </motion.div>
     </MotionConfig>
   )
 }

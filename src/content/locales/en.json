@@ -45,6 +45,10 @@
       "success": "Copied to clipboard"
     }
   },
+  "footer": {
+    "credit": "Hand prompted by Devvrat",
+    "rights": "All Rights Are Left"
+  },
   "meta": {
     "documentTitle": "Devvrat"
   }
