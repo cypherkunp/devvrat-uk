@@ -198,6 +198,31 @@ describe('Link Hub page', () => {
     })
   })
 
+  it('toggles monochrome mode from the Display switch tile', () => {
+    const { locale, analytics } = renderPage()
+    const action = locale.actions.mono
+    const control = screen.getByRole('switch', {
+      name: `${action.label}: ${action.title}`,
+    })
+
+    expect(control.getAttribute('aria-checked')).toBe('false')
+    expect(document.querySelector('[data-mono="true"]')).toBeNull()
+
+    fireEvent.click(control)
+
+    expect(control.getAttribute('aria-checked')).toBe('true')
+    expect(document.querySelector('[data-mono="true"]')).toBeTruthy()
+    expect(analytics.events).toContainEqual({
+      type: 'action_click',
+      actionId: 'mono',
+    })
+
+    fireEvent.click(control)
+
+    expect(control.getAttribute('aria-checked')).toBe('false')
+    expect(document.querySelector('[data-mono="true"]')).toBeNull()
+  })
+
   it('does not record link_click for Photos placeholder', () => {
     const { locale, analytics } = renderPage()
     const photos = locale.links.photos

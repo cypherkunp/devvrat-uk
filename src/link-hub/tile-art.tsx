@@ -100,4 +100,14 @@ export const tileArt: Record<LinkId | ActionId, TileArt> = {
       </LineGlyph>
     ),
   },
+  mono: {
+    accent: '#f4f4f5',
+    glyph: (
+      <LineGlyph>
+        <circle cx="12" cy="12" r="9.25" />
+        <path d="M12 2.75v18.5" />
+        <path d="M12 2.75a9.25 9.25 0 0 0 0 18.5" fill="currentColor" stroke="none" />
+      </LineGlyph>
+    ),
+  },
 }

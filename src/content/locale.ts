@@ -37,6 +37,7 @@ export type Locale = {
   }
   actions: {
     'copy-url': ActionCopy
+    mono: Pick<ActionCopy, 'label' | 'title'>
   }
   footer: {
     credit: string

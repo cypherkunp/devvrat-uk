@@ -48,6 +48,10 @@
       "label": "Copy URL",
       "title": "Share this hub",
       "success": "Copied to clipboard"
+    },
+    "mono": {
+      "label": "Display",
+      "title": "Monochrome"
     }
   },
   "footer": {
