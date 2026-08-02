@@ -490,7 +490,7 @@ export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
               <motion.p
                 variants={itemVariants}
                 style={{ clipPath: chipCut }}
-                className="hud-tag inline-flex items-center border border-cyan-300/40 bg-cyan-400/10 px-3 py-1 font-mono text-[0.65rem] font-medium tracking-[0.3em] text-cyan-200 uppercase [text-shadow:0_0_14px_rgba(34,211,238,0.55)]"
+                className="hud-tag inline-flex max-w-full items-center border border-cyan-300/40 bg-cyan-400/10 px-3 py-1 font-mono text-[0.65rem] font-medium tracking-[0.18em] text-cyan-200 uppercase [text-shadow:0_0_14px_rgba(34,211,238,0.55)]"
               >
                 {identity.role}
               </motion.p>
