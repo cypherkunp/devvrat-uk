@@ -10,105 +10,74 @@ body,
   min-height: 100%;
 }
 
+:root {
+  color-scheme: light;
+  --hub-bg: #f5f5f7;
+  --hub-fg: #1d1d1f;
+  --hub-muted: #6e6e73;
+  --hub-hairline: rgba(0, 0, 0, 0.08);
+  --hub-fill: rgba(255, 255, 255, 0.72);
+  --hub-fill-solid: #ffffff;
+  --hub-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
+  --hub-shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.04),
+    0 16px 40px rgba(0, 0, 0, 0.1);
+  --hub-accent: #0071e3;
+  --hub-ok: #34c759;
+  --hub-pending: #ff9f0a;
+}
+
 body {
   margin: 0;
-  background: #000;
-  color: #fafafa;
+  background: var(--hub-bg);
+  color: var(--hub-fg);
+  font: 100% / 1.47 -apple-system, BlinkMacSystemFont, 'SF Pro Text',
+    'Segoe UI', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-/* --- Neon HUD ------------------------------------------------------------ */
-
-/* Decorative glyphs are generated content so they stay out of the accessible
-   name and out of textContent. */
-.hud-tag::before {
-  content: '// ';
-  opacity: 0.55;
+/* Display name: tighten tracking as size grows (Apple UI Typography). */
+.display-title {
+  font-weight: 600;
+  letter-spacing: -0.022em;
+  line-height: 1.05;
+  font-optical-sizing: auto;
 }
 
-.hud-brackets::before {
-  content: '[';
-  margin-right: 0.45em;
-  opacity: 0.6;
-}
-
-.hud-brackets::after {
-  content: ']';
-  margin-left: 0.45em;
-  opacity: 0.6;
-}
-
-.neon-title {
-  text-shadow:
-    0 0 14px rgba(34, 211, 238, 0.45),
-    0 0 46px rgba(217, 70, 239, 0.3);
-}
-
-/* Chromatic split of the display name, drawn from data-text so the heading
-   keeps exactly one text node. */
-.glitch {
-  position: relative;
-}
-
-.glitch::before,
-.glitch::after {
-  content: attr(data-text);
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  pointer-events: none;
-  text-shadow: none;
-}
-
-.glitch::before {
-  color: #22d3ee;
-  clip-path: inset(0 0 52% 0);
-  animation: glitch-upper 5s infinite steps(2, end);
-}
-
-.glitch::after {
-  color: #ff2fd0;
-  clip-path: inset(52% 0 0 0);
-  animation: glitch-lower 5s infinite steps(2, end);
-}
-
-@keyframes glitch-upper {
-  0%,
-  90%,
-  100% {
-    opacity: 0;
-    transform: translate3d(0, 0, 0);
-  }
-  91% {
-    opacity: 0.75;
-    transform: translate3d(-3px, -1px, 0);
-  }
-  94% {
-    opacity: 0.5;
-    transform: translate3d(2px, 1px, 0);
+@media (min-width: 768px) {
+  .display-title {
+    letter-spacing: -0.028em;
   }
 }
 
-@keyframes glitch-lower {
-  0%,
-  90%,
-  100% {
-    opacity: 0;
-    transform: translate3d(0, 0, 0);
-  }
-  92% {
-    opacity: 0.65;
-    transform: translate3d(3px, 1px, 0);
-  }
-  96% {
-    opacity: 0.45;
-    transform: translate3d(-2px, -1px, 0);
+@media (min-width: 1024px) {
+  .display-title {
+    letter-spacing: -0.032em;
   }
 }
 
-/* Monochrome: black stage stays; neon chroma collapses to white / silver. */
+/* Material surfaces — frosted layer, content scrolls under conceptually. */
+.material {
+  background: var(--hub-fill);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: var(--hub-shadow);
+}
+
+.material-heavy {
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow: var(--hub-shadow);
+  /* Bright top edge — light catching the material (Apple materials). */
+  border-top-color: rgba(255, 255, 255, 0.95);
+}
+
+/* Monochrome: desaturate accents; stage stays light. */
 [data-mono='true'] {
-  filter: grayscale(1) brightness(1.22) contrast(1.12);
+  filter: grayscale(1) contrast(1.05);
 }
 
 /* Motion is enhancement: CSS transitions/animations collapse for reduced-motion
@@ -121,5 +90,24 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .material,
+  .material-heavy {
+    background: var(--hub-fill-solid);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .material,
+  .material-heavy {
+    background: var(--hub-fill-solid);
+    border-color: var(--hub-fg);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
 }
