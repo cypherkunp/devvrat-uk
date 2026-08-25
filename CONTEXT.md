@@ -28,8 +28,8 @@ An outbound destination shown as a tile on the Link Hub (label, title, optional 
 _Avoid_: Card, button, social (as the noun for one entry)
 
 **Action**:
-An on-page control that copies the Link Hub's own URL to the clipboard. Launch Action is the Copy URL tile (no Share FAB).
-_Avoid_: Link, CTA (as a synonym for Action), button (as the noun), share
+An on-page control on the Link Hub that is not a Link. Launch Actions: Copy URL (clipboard), Mono (grayscale Display switch), and Dark (scheme switch). Dark defaults to the visitor's OS color scheme; a flip lasts this Visit only. Mono and Dark are independent (all four light/dark × color/mono combinations are valid).
+_Avoid_: Link, CTA (as a synonym for Action), button (as the noun), share, theme (as the noun)
 
 **Locale**:
 A language edition of all Link Hub copy. Every visitor-facing string belongs to a Locale. Launch Locale is `en`.

@@ -223,6 +223,85 @@ describe('Link Hub page', () => {
     expect(document.querySelector('[data-mono="true"]')).toBeNull()
   })
 
+  it('toggles Dark from the Appearance switch tile', () => {
+    const { locale, analytics } = renderPage()
+    const action = locale.actions.dark
+    const control = screen.getByRole('switch', {
+      name: `${action.label}: ${action.title}`,
+    })
+
+    expect(control.getAttribute('aria-checked')).toBe('false')
+    expect(document.querySelector('[data-scheme]')).toBeNull()
+
+    fireEvent.click(control)
+
+    expect(control.getAttribute('aria-checked')).toBe('true')
+    expect(document.querySelector('[data-scheme="dark"]')).toBeTruthy()
+    expect(analytics.events).toContainEqual({
+      type: 'action_click',
+      actionId: 'dark',
+    })
+
+    fireEvent.click(control)
+
+    expect(control.getAttribute('aria-checked')).toBe('false')
+    expect(document.querySelector('[data-scheme="light"]')).toBeTruthy()
+  })
+
+  it('follows OS dark without a session scheme until the switch is used', () => {
+    const previous = window.matchMedia
+    Object.defineProperty(window, 'matchMedia', {
+      configurable: true,
+      value: (query: string) => ({
+        matches: query.includes('prefers-color-scheme: dark'),
+        media: query,
+        onchange: null,
+        addListener: () => {},
+        removeListener: () => {},
+        addEventListener: () => {},
+        removeEventListener: () => {},
+        dispatchEvent: () => false,
+      }),
+    })
+
+    try {
+      const { locale } = renderPage()
+      const action = locale.actions.dark
+      const control = screen.getByRole('switch', {
+        name: `${action.label}: ${action.title}`,
+      })
+
+      expect(control.getAttribute('aria-checked')).toBe('true')
+      expect(document.querySelector('[data-scheme]')).toBeNull()
+    } finally {
+      Object.defineProperty(window, 'matchMedia', {
+        configurable: true,
+        value: previous,
+      })
+    }
+  })
+
+  it('keeps Dark and Mono independent', () => {
+    const { locale } = renderPage()
+    const dark = locale.actions.dark
+    const mono = locale.actions.mono
+
+    fireEvent.click(
+      screen.getByRole('switch', {
+        name: `${dark.label}: ${dark.title}`,
+      }),
+    )
+    fireEvent.click(
+      screen.getByRole('switch', {
+        name: `${mono.label}: ${mono.title}`,
+      }),
+    )
+
+    const stage = document.querySelector('.hub-stage')
+    expect(stage?.getAttribute('data-scheme')).toBe('dark')
+    expect(stage?.getAttribute('data-mono')).toBe('true')
+  })
+
   it('does not record link_click for Photos placeholder', () => {
     const { locale, analytics } = renderPage()
     const photos = locale.links.photos

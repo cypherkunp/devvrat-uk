@@ -52,6 +52,10 @@
     "mono": {
       "label": "Display",
       "title": "Monochrome"
+    },
+    "dark": {
+      "label": "Appearance",
+      "title": "Dark"
     }
   },
   "footer": {

@@ -18,14 +18,76 @@ body,
   --hub-hairline: rgba(0, 0, 0, 0.08);
   --hub-fill: rgba(255, 255, 255, 0.72);
   --hub-fill-solid: #ffffff;
+  --hub-fill-heavy: rgba(255, 255, 255, 0.78);
+  --hub-border: rgba(255, 255, 255, 0.7);
+  --hub-border-top: rgba(255, 255, 255, 0.95);
   --hub-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
   --hub-shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.04),
     0 16px 40px rgba(0, 0, 0, 0.1);
   --hub-accent: #0071e3;
   --hub-ok: #34c759;
+  --hub-ok-fg: #1b7a36;
   --hub-pending: #ff9f0a;
+  --hub-mix: #ffffff;
+  --hub-blob-a: #d2e3fc;
+  --hub-blob-b: #e8e8ed;
+  --hub-portrait-bg: #e8e8ed;
+  --hub-portrait-veil: rgba(245, 245, 247, 0.55);
   /* Strong ease-out — built-ins are too weak for UI punch. */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Dark tokens: OS default (no session attr) or session override on .hub-stage. */
+@media (prefers-color-scheme: dark) {
+  :root:not(:has([data-scheme='light'])) {
+    color-scheme: dark;
+    --hub-bg: #000000;
+    --hub-fg: #f5f5f7;
+    --hub-muted: #86868b;
+    --hub-hairline: rgba(255, 255, 255, 0.12);
+    --hub-fill: rgba(44, 44, 46, 0.72);
+    --hub-fill-solid: #1c1c1e;
+    --hub-fill-heavy: rgba(28, 28, 30, 0.78);
+    --hub-border: rgba(255, 255, 255, 0.12);
+    --hub-border-top: rgba(255, 255, 255, 0.22);
+    --hub-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.45);
+    --hub-shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.45),
+      0 16px 40px rgba(0, 0, 0, 0.55);
+    --hub-accent: #0a84ff;
+    --hub-ok: #30d158;
+    --hub-ok-fg: #30d158;
+    --hub-pending: #ff9f0a;
+    --hub-mix: #000000;
+    --hub-blob-a: #0a3166;
+    --hub-blob-b: #1c1c1e;
+    --hub-portrait-bg: #2c2c2e;
+    --hub-portrait-veil: rgba(0, 0, 0, 0.55);
+  }
+}
+
+:root:has([data-scheme='dark']) {
+  color-scheme: dark;
+  --hub-bg: #000000;
+  --hub-fg: #f5f5f7;
+  --hub-muted: #86868b;
+  --hub-hairline: rgba(255, 255, 255, 0.12);
+  --hub-fill: rgba(44, 44, 46, 0.72);
+  --hub-fill-solid: #1c1c1e;
+  --hub-fill-heavy: rgba(28, 28, 30, 0.78);
+  --hub-border: rgba(255, 255, 255, 0.12);
+  --hub-border-top: rgba(255, 255, 255, 0.22);
+  --hub-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.45);
+  --hub-shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.45),
+    0 16px 40px rgba(0, 0, 0, 0.55);
+  --hub-accent: #0a84ff;
+  --hub-ok: #30d158;
+  --hub-ok-fg: #30d158;
+  --hub-pending: #ff9f0a;
+  --hub-mix: #000000;
+  --hub-blob-a: #0a3166;
+  --hub-blob-b: #1c1c1e;
+  --hub-portrait-bg: #2c2c2e;
+  --hub-portrait-veil: rgba(0, 0, 0, 0.55);
 }
 
 body {
@@ -63,18 +125,18 @@ body {
   background: var(--hub-fill);
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.7);
+  border: 1px solid var(--hub-border);
   box-shadow: var(--hub-shadow);
 }
 
 .material-heavy {
-  background: rgba(255, 255, 255, 0.78);
+  background: var(--hub-fill-heavy);
   backdrop-filter: blur(40px) saturate(180%);
   -webkit-backdrop-filter: blur(40px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.75);
+  border: 1px solid var(--hub-border);
   box-shadow: var(--hub-shadow);
   /* Bright top edge — light catching the material (Apple materials). */
-  border-top-color: rgba(255, 255, 255, 0.95);
+  border-top-color: var(--hub-border-top);
 }
 
 /* Mono toggle: state indication via filter settle (occasional action). */
@@ -103,9 +165,10 @@ body {
 }
 
 .tile-arrow {
+  /* Color uses ease (hover); transform keeps strong ease-out. */
   transition:
     transform 160ms var(--ease-out),
-    color 160ms var(--ease-out);
+    color 160ms ease;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -129,7 +192,7 @@ body {
   }
 }
 
-/* Monochrome: desaturate accents; stage stays light. */
+/* Monochrome: desaturate accents; independent of scheme. */
 [data-mono='true'] {
   filter: grayscale(1) contrast(1.05);
 }

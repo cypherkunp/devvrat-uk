@@ -1,12 +1,8 @@
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
+import { AnimatePresence, motion } from 'motion/react'
 
 import type { ConfiguredLink } from '#/content/hub-config'
 import type { LinkCopy } from '#/content/locale'
-import {
-  easeOut,
-  feedbackTransition,
-  itemVariants,
-} from '#/link-hub/motion'
+import { feedbackEnter, feedbackExit, itemVariants } from '#/link-hub/motion'
 import { tileArt } from '#/link-hub/tile-art'
 import type { TileArt } from '#/link-hub/tile-art'
 
@@ -99,22 +95,59 @@ export type Tone = 'pending' | 'ok'
 
 const toneClass: Record<Tone, string> = {
   pending:
-    'bg-[color-mix(in_srgb,var(--hub-pending)_14%,white)] text-[#9a6700]',
-  ok: 'bg-[color-mix(in_srgb,var(--hub-ok)_14%,white)] text-[#1b7a36]',
+    'bg-[color-mix(in_srgb,var(--hub-pending)_14%,var(--hub-mix))] text-[#9a6700]',
+  ok: 'bg-[color-mix(in_srgb,var(--hub-ok)_14%,var(--hub-mix))] text-[var(--hub-ok-fg)]',
 }
 
-/** Same-direction enter/exit + scale floor — spatial consistency, no scale(0). */
+/** Morphs into the caption slot — state indication, not a floating overlay. */
 function StatusMessage({ children, tone }: { children: string; tone: Tone }) {
   return (
     <motion.span
       role="status"
-      initial={{ opacity: 0, transform: 'translateY(6px) scale(0.96)' }}
-      animate={{ opacity: 1, transform: 'translateY(0px) scale(1)' }}
-      exit={{ opacity: 0, transform: 'translateY(6px) scale(0.96)' }}
-      transition={feedbackTransition}
-      className={`absolute right-3 bottom-3 rounded-full px-2.5 py-1 text-[0.6875rem] font-medium tracking-[0.01em] ${toneClass[tone]}`}
+      initial={{
+        opacity: 0,
+        filter: 'blur(2px)',
+        transform: 'translateY(4px)',
+      }}
+      animate={{
+        opacity: 1,
+        filter: 'blur(0px)',
+        transform: 'translateY(0px)',
+        transition: feedbackEnter,
+      }}
+      exit={{
+        opacity: 0,
+        filter: 'blur(2px)',
+        transform: 'translateY(4px)',
+        transition: feedbackExit,
+      }}
+      className={`inline-flex rounded-full px-2.5 py-1 text-[0.6875rem] font-medium tracking-[0.01em] ${toneClass[tone]}`}
     >
       {children}
+    </motion.span>
+  )
+}
+
+function CaptionBody({ title, handle }: Omit<LinkCopy, 'label'>) {
+  return (
+    <motion.span
+      initial={false}
+      exit={{
+        opacity: 0,
+        filter: 'blur(2px)',
+        transform: 'translateY(-3px)',
+        transition: feedbackExit,
+      }}
+      className="block"
+    >
+      <span className="block text-[1.0625rem] font-semibold tracking-[-0.015em] text-[var(--hub-fg)]">
+        {title}
+      </span>
+      {handle ? (
+        <span className="mt-0.5 block text-[0.8125rem] tracking-[0.01em] text-[var(--hub-muted)]">
+          {handle}
+        </span>
+      ) : null}
     </motion.span>
   )
 }
@@ -179,12 +212,22 @@ export function ButtonTile({
           <TileChip art={art} />
           <TileLabel label={copy.label} />
         </span>
-        <TileCaption title={copy.title} handle={copy.handle} />
-        <AnimatePresence>
-          {message ? (
-            <StatusMessage tone={tone}>{message}</StatusMessage>
-          ) : null}
-        </AnimatePresence>
+        {/* Reserved height so morph doesn't reflow the grid. */}
+        <span className="mt-auto block min-h-[2.75rem] pt-5">
+          <AnimatePresence initial={false}>
+            {message ? (
+              <StatusMessage key="status" tone={tone}>
+                {message}
+              </StatusMessage>
+            ) : (
+              <CaptionBody
+                key="caption"
+                title={copy.title}
+                handle={copy.handle}
+              />
+            )}
+          </AnimatePresence>
+        </span>
       </button>
     </motion.div>
   )
@@ -194,17 +237,17 @@ function AppleSwitch({ on }: { on: boolean }) {
   return (
     <span
       aria-hidden="true"
-      className="relative h-[1.75rem] w-[3.1rem] shrink-0 rounded-full transition-[background-color] duration-200"
+      className="relative h-[1.75rem] w-[3.1rem] shrink-0 rounded-full"
       style={{
         backgroundColor: on ? 'var(--hub-ok)' : 'rgba(120, 120, 128, 0.32)',
-        transitionTimingFunction: 'var(--ease-out)',
+        transition: 'background-color 160ms var(--ease-out)',
       }}
     >
       <span
-        className="absolute top-[0.125rem] size-[1.5rem] rounded-full bg-white shadow-[0_1px_3px_rgba(0,0,0,0.22),0_1px_1px_rgba(0,0,0,0.12)] transition-transform duration-200"
+        className="absolute top-[0.125rem] size-[1.5rem] rounded-full bg-white shadow-[0_1px_3px_rgba(0,0,0,0.22),0_1px_1px_rgba(0,0,0,0.12)]"
         style={{
           transform: on ? 'translateX(1.35rem)' : 'translateX(0.125rem)',
-          transitionTimingFunction: 'var(--ease-out)',
+          transition: 'transform 160ms var(--ease-out)',
         }}
       />
     </span>
@@ -248,30 +291,12 @@ export function SwitchTile({
   )
 }
 
+/** Static mark — availability is Locale copy, not a live signal. */
 export function AvailabilityPulse() {
-  const reduceMotion = useReducedMotion()
-
   return (
-    <span aria-hidden="true" className="relative flex size-2 shrink-0">
-      {/* Ring always in the tree so SSR and client markup match. */}
-      <motion.span
-        className="absolute inset-0 rounded-full bg-[var(--hub-ok)]"
-        initial={{ opacity: 0 }}
-        animate={
-          reduceMotion
-            ? { opacity: 0 }
-            : {
-                transform: ['scale(1)', 'scale(2.2)', 'scale(1)'],
-                opacity: [0.55, 0, 0.55],
-              }
-        }
-        transition={
-          reduceMotion
-            ? { duration: 0 }
-            : { duration: 2.4, repeat: Infinity, ease: easeOut }
-        }
-      />
-      <span className="relative size-2 rounded-full bg-[var(--hub-ok)]" />
-    </span>
+    <span
+      aria-hidden="true"
+      className="size-2 shrink-0 rounded-full bg-[var(--hub-ok)]"
+    />
   )
 }

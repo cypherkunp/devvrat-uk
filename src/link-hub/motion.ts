@@ -10,9 +10,14 @@ export const springDefault: Transition = {
   duration: 0.28,
 }
 
-/** Occasional feedback (status pill) — duration-based, interruptible. */
-export const feedbackTransition: Transition = {
+/** Status / caption morph — enter. Exit is shorter on the node. */
+export const feedbackEnter: Transition = {
   duration: 0.18,
+  ease: easeOut,
+}
+
+export const feedbackExit: Transition = {
+  duration: 0.12,
   ease: easeOut,
 }
 
@@ -32,12 +37,12 @@ export const mainVariants: Variants = {
   },
 }
 
-/** Identity panel: soft settle + stagger copy/portrait inside. */
+/** Identity panel: soft settle (no scale — large frosted surfaces look floaty). */
 export const panelVariants: Variants = {
-  hidden: { opacity: 0, transform: 'translateY(10px) scale(0.98)' },
+  hidden: { opacity: 0, transform: 'translateY(10px)' },
   visible: {
     opacity: 1,
-    transform: 'translateY(0px) scale(1)',
+    transform: 'translateY(0px)',
     transition: {
       ...springDefault,
       staggerChildren: 0.04,

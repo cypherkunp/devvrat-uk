@@ -1,8 +1,13 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, useSyncExternalStore } from 'react'
 import { MotionConfig, motion } from 'motion/react'
 
 import type { AnalyticsPort } from '#/analytics/port'
-import { copyUrlActionId, hubLinks, monoActionId } from '#/content/hub-config'
+import {
+  copyUrlActionId,
+  darkActionId,
+  hubLinks,
+  monoActionId,
+} from '#/content/hub-config'
 import type { ConfiguredLink, HubLink } from '#/content/hub-config'
 import type { Locale } from '#/content/locale'
 import { portraitAscii, portraitAsciiColumns } from '#/link-hub/portrait-ascii'
@@ -29,6 +34,23 @@ export type LinkHubPageProps = {
 }
 
 const messageDurationMs = 2400
+
+function subscribeOsDark(onStoreChange: () => void) {
+  if (typeof window.matchMedia !== 'function') return () => {}
+  const mq = window.matchMedia('(prefers-color-scheme: dark)')
+  mq.addEventListener('change', onStoreChange)
+  return () => mq.removeEventListener('change', onStoreChange)
+}
+
+function getOsDark() {
+  if (typeof window.matchMedia !== 'function') return false
+  return window.matchMedia('(prefers-color-scheme: dark)').matches
+}
+
+/** Server snapshot is light — CSS media query still paints OS dark on first frame. */
+function useOsDark() {
+  return useSyncExternalStore(subscribeOsDark, getOsDark, () => false)
+}
 
 function isConfigured(link: HubLink): link is ConfiguredLink {
   return 'href' in link
@@ -59,11 +81,11 @@ function AsciiPortrait({ alt }: { alt: string }) {
     <span
       role="img"
       aria-label={alt}
-      className="@container relative isolate block size-64 overflow-hidden rounded-[1.75rem] bg-[#e8e8ed] md:size-72 lg:size-[clamp(11rem,24vh,18rem)]"
+      className="@container relative isolate block size-64 overflow-hidden rounded-[1.75rem] bg-[var(--hub-portrait-bg)] md:size-72 lg:size-[clamp(11rem,24vh,18rem)]"
     >
       <pre
         aria-hidden="true"
-        className="m-0 bg-gradient-to-b from-[#1d1d1f] via-[#424245] to-[#86868b] bg-clip-text font-mono text-transparent"
+        className="m-0 bg-gradient-to-b from-[var(--hub-fg)] via-[#424245] to-[var(--hub-muted)] bg-clip-text font-mono text-transparent"
         style={{
           fontSize: `calc(100cqw / ${asciiWidthEm})`,
           lineHeight: 1.14,
@@ -73,11 +95,11 @@ function AsciiPortrait({ alt }: { alt: string }) {
       </pre>
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 [background:radial-gradient(circle_at_50%_38%,transparent_42%,rgba(245,245,247,0.55)_100%)]"
+        className="pointer-events-none absolute inset-0 [background:radial-gradient(circle_at_50%_38%,transparent_42%,var(--hub-portrait-veil)_100%)]"
       />
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-[#f5f5f7] to-transparent"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-[var(--hub-bg)] to-transparent"
       />
     </span>
   )
@@ -104,8 +126,14 @@ export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
   const [photosMessage, showPhotosMessage] = useTransientMessage()
   const [copyFeedback, showCopyFeedback] = useTransientMessage()
   const [monochrome, setMonochrome] = useState(false)
+  const [schemeOverride, setSchemeOverride] = useState<'light' | 'dark' | null>(
+    null,
+  )
+  const osDark = useOsDark()
+  const dark = schemeOverride === 'dark' || (schemeOverride === null && osDark)
   const copyAction = locale.actions[copyUrlActionId]
   const monoAction = locale.actions[monoActionId]
+  const darkAction = locale.actions[darkActionId]
   const photosCopy = locale.links.photos
 
   useEffect(() => {
@@ -128,6 +156,11 @@ export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
     analytics.track({ type: 'action_click', actionId: monoActionId })
   }
 
+  function toggleDark(next: boolean) {
+    setSchemeOverride(next ? 'dark' : 'light')
+    analytics.track({ type: 'action_click', actionId: darkActionId })
+  }
+
   return (
     <MotionConfig reducedMotion="user" transition={springDefault}>
       <motion.div
@@ -135,14 +168,15 @@ export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
         animate="visible"
         variants={pageVariants}
         data-mono={monochrome ? 'true' : undefined}
+        data-scheme={schemeOverride ?? undefined}
         className="hub-stage relative flex min-h-dvh flex-col bg-[var(--hub-bg)] text-[var(--hub-fg)] lg:h-dvh"
       >
         <span
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 overflow-hidden"
         >
-          <span className="absolute -top-40 left-1/2 size-[42rem] -translate-x-1/2 rounded-full bg-[#d2e3fc]/50 blur-[120px]" />
-          <span className="absolute right-[-10%] bottom-[-8%] size-[28rem] rounded-full bg-[#e8e8ed]/80 blur-[100px]" />
+          <span className="absolute -top-40 left-1/2 size-[42rem] -translate-x-1/2 rounded-full bg-[color-mix(in_srgb,var(--hub-blob-a)_50%,transparent)] blur-[120px]" />
+          <span className="absolute right-[-10%] bottom-[-8%] size-[28rem] rounded-full bg-[color-mix(in_srgb,var(--hub-blob-b)_80%,transparent)] blur-[100px]" />
         </span>
 
         <motion.main
@@ -160,7 +194,7 @@ export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
             >
               <motion.p
                 variants={itemVariants}
-                className="inline-flex max-w-full items-center rounded-full bg-[color-mix(in_srgb,var(--hub-accent)_10%,white)] px-3 py-1 text-[0.75rem] font-medium tracking-[0.01em] text-[var(--hub-accent)]"
+                className="inline-flex max-w-full items-center rounded-full bg-[color-mix(in_srgb,var(--hub-accent)_10%,var(--hub-mix))] px-3 py-1 text-[0.75rem] font-medium tracking-[0.01em] text-[var(--hub-accent)]"
               >
                 {identity.role}
               </motion.p>
@@ -178,7 +212,7 @@ export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
               </motion.p>
               <motion.p
                 variants={itemVariants}
-                className="inline-flex items-center gap-2 rounded-full bg-[color-mix(in_srgb,var(--hub-ok)_12%,white)] px-3 py-1 text-[0.8125rem] font-medium tracking-[0.01em] text-[#1b7a36]"
+                className="inline-flex items-center gap-2 rounded-full bg-[color-mix(in_srgb,var(--hub-ok)_12%,var(--hub-mix))] px-3 py-1 text-[0.8125rem] font-medium tracking-[0.01em] text-[var(--hub-ok-fg)]"
               >
                 <AvailabilityPulse />
                 {identity.availability}
@@ -236,6 +270,12 @@ export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
                 copy={{ label: monoAction.label, title: monoAction.title }}
                 checked={monochrome}
                 onCheckedChange={toggleMonochrome}
+              />
+              <SwitchTile
+                art={tileArt[darkActionId]}
+                copy={{ label: darkAction.label, title: darkAction.title }}
+                checked={dark}
+                onCheckedChange={toggleDark}
               />
             </section>
           </motion.div>

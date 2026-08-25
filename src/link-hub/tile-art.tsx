@@ -110,4 +110,12 @@ export const tileArt: Record<LinkId | ActionId, TileArt> = {
       </LineGlyph>
     ),
   },
+  dark: {
+    accent: '#0a84ff',
+    glyph: (
+      <LineGlyph>
+        <path d="M12 3a6.4 6.4 0 0 0 9 9 9.25 9.25 0 1 1-9-9z" />
+      </LineGlyph>
+    ),
+  },
 }
