@@ -22,10 +22,12 @@ function TileChip({ art }: { art: TileArt }) {
   return (
     <span
       aria-hidden="true"
-      className="flex size-8 shrink-0 items-center justify-center rounded-[6px] p-1.5"
+      className="flex size-8 shrink-0 items-center justify-center rounded-[6px] p-2"
       style={{
         color: art.accent,
-        backgroundColor: `${art.accent}1f`,
+        backgroundColor:
+          art.chip ??
+          `color-mix(in srgb, ${art.accent} 22%, var(--ds-gray-200))`,
       }}
     >
       {art.glyph}
