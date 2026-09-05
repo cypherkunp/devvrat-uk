@@ -23,6 +23,7 @@ export type Locale = {
     role: string
     displayName: string
     bio: string
+    bioLabel: string
     availability: string
     portraitAlt: string
   }
@@ -34,6 +35,7 @@ export type Locale = {
     'central-hub': LinkCopy
     handbook: LinkCopy
     photos: PhotosCopy
+    resume: LinkCopy
   }
   actions: {
     'copy-url': ActionCopy

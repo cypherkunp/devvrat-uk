@@ -3,6 +3,7 @@
     "role": "AI Sorcerer | Engineer | Craftsman",
     "displayName": "Devvrat",
     "bio": "I am software engineer specializing in web app development. My passion is crafting digital experiences and building high-performance development teams.",
+    "bioLabel": "About",
     "availability": "Available for Hire",
     "portraitAlt": "Portrait of Devvrat"
   },
@@ -41,6 +42,11 @@
       "label": "Photos",
       "title": "Gallery",
       "comingSoon": "Coming soon"
+    },
+    "resume": {
+      "label": "Availability",
+      "title": "Available for Hire",
+      "handle": "devvrat.cc/resume"
     }
   },
   "actions": {

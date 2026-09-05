@@ -27,8 +27,14 @@ describe('Link Hub page', () => {
     const { locale } = renderPage()
 
     expect(screen.getByText(locale.identity.role)).toBeTruthy()
-    expect(screen.getByText(locale.identity.displayName)).toBeTruthy()
+    expect(
+      screen.getByRole('heading', {
+        level: 1,
+        name: locale.identity.displayName,
+      }),
+    ).toBeTruthy()
     expect(screen.getByText(locale.identity.bio)).toBeTruthy()
+    expect(screen.queryByText(locale.identity.bioLabel)).toBeNull()
     expect(screen.getByText(locale.identity.availability)).toBeTruthy()
     expect(locale.identity.availability).toBe('Available for Hire')
 
@@ -44,6 +50,12 @@ describe('Link Hub page', () => {
 
     expect(screen.queryByText(/EST\./i)).toBeNull()
     expect(screen.queryByRole('button', { name: /^share$/i })).toBeNull()
+
+    const resume = screen.getByRole('link', {
+      name: `${locale.links.resume.label}: ${locale.identity.availability}`,
+    })
+    expect(resume.getAttribute('href')).toBe('https://www.devvrat.cc/resume')
+    expect(screen.getByText(locale.links.resume.handle!)).toBeTruthy()
   })
 
   it('credits the Owner in a footer landmark outside the main content', () => {
@@ -172,6 +184,21 @@ describe('Link Hub page', () => {
     expect(analytics.events).toContainEqual({
       type: 'link_click',
       linkId: 'email',
+    })
+  })
+
+  it('records link_click for the resume Link on the hire tile', () => {
+    const { locale, analytics } = renderPage()
+
+    fireEvent.click(
+      screen.getByRole('link', {
+        name: `${locale.links.resume.label}: ${locale.identity.availability}`,
+      }),
+    )
+
+    expect(analytics.events).toContainEqual({
+      type: 'link_click',
+      linkId: 'resume',
     })
   })
 

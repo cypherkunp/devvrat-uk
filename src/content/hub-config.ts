@@ -6,6 +6,7 @@ export type LinkId =
   | 'central-hub'
   | 'handbook'
   | 'photos'
+  | 'resume'
 
 export type ConfiguredLink = {
   id: Exclude<LinkId, 'photos'>
@@ -20,6 +21,8 @@ export type PlaceholderLink = {
 export type HubLink = ConfiguredLink | PlaceholderLink
 
 export type ActionId = 'copy-url' | 'mono' | 'dark'
+
+export const resumeHref = 'https://www.devvrat.cc/resume'
 
 export const copyUrlActionId = 'copy-url' as const satisfies ActionId
 export const monoActionId = 'mono' as const satisfies ActionId

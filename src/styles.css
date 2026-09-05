@@ -402,7 +402,7 @@ body {
   }
 
   .hub-grid .geist-grid {
-    grid-template-rows: minmax(0, 1.55fr) repeat(3, minmax(0, 1fr));
+    grid-template-rows: repeat(4, minmax(0, 1fr));
   }
 
   .hub-grid .tile {
@@ -426,6 +426,10 @@ body {
   transition-duration: 100ms;
 }
 
+.tile-static:active {
+  transform: none;
+}
+
 .tile-arrow {
   transition:
     transform 160ms var(--ease-out),
@@ -439,6 +443,10 @@ body {
 
   .tile:hover:active {
     transform: scale(0.97);
+  }
+
+  .tile-static:hover:active {
+    transform: none;
   }
 
   .tile:hover .tile-arrow {

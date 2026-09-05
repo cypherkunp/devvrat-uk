@@ -2,16 +2,28 @@ import { AnimatePresence, motion } from 'motion/react'
 
 import type { ConfiguredLink } from '#/content/hub-config'
 import type { LinkCopy } from '#/content/locale'
+import { Badge } from '#/geist/components'
 import { feedbackEnter, feedbackExit } from '#/link-hub/motion'
 import { tileArt } from '#/link-hub/tile-art'
 import type { TileArt } from '#/link-hub/tile-art'
 
 /** Interactive surface — hover/press are CSS so they stay compositor-friendly. */
-export function tileClass() {
+export function tileClass(
+  staticTile = false,
+  align: 'left' | 'center' = 'left',
+) {
   return [
-    'tile group relative isolate flex h-full min-h-24 w-full flex-col px-4 py-3.5 text-left',
+    'tile group relative isolate flex h-full min-h-24 w-full flex-col px-4 py-3.5',
+    align === 'center'
+      ? 'items-center justify-center gap-3 text-center'
+      : staticTile
+        ? 'items-start justify-center text-left'
+        : 'text-left',
     'focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--ds-blue-700)]',
-  ].join(' ')
+    staticTile ? 'tile-static' : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
 }
 
 function controlLabel({ label, title }: Pick<LinkCopy, 'label' | 'title'>) {
@@ -122,6 +134,38 @@ function CaptionBody({ title, handle }: Omit<LinkCopy, 'label'>) {
         </span>
       ) : null}
     </motion.span>
+  )
+}
+
+export function StaticTile({
+  copy,
+  titleAs,
+  showLabel = true,
+  align = 'center',
+}: {
+  copy: LinkCopy
+  titleAs?: 'h1'
+  showLabel?: boolean
+  align?: 'left' | 'center'
+}) {
+  const Title = titleAs ?? 'p'
+  return (
+    <div className={tileClass(true, align)}>
+      {showLabel ? (
+        <Badge variant="gray" contrast="low">
+          {copy.label}
+        </Badge>
+      ) : null}
+      <Title
+        className={
+          titleAs === 'h1'
+            ? 'display-title min-w-0 text-4xl text-[var(--hub-fg)] md:text-5xl lg:text-6xl'
+            : 'text-copy-16 min-w-0 text-[var(--hub-muted)]'
+        }
+      >
+        {copy.title}
+      </Title>
+    </div>
   )
 }
 
@@ -238,15 +282,5 @@ export function SwitchTile({
         <GeistToggle on={checked} />
       </span>
     </button>
-  )
-}
-
-/** Static mark — availability is Locale copy, not a live signal. */
-export function AvailabilityPulse() {
-  return (
-    <span
-      aria-hidden="true"
-      className="size-1.5 shrink-0 rounded-full bg-[var(--hub-ok)]"
-    />
   )
 }

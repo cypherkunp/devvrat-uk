@@ -7,11 +7,11 @@ import {
   darkActionId,
   hubLinks,
   monoActionId,
+  resumeHref,
 } from '#/content/hub-config'
 import type { ConfiguredLink, HubLink } from '#/content/hub-config'
 import type { Locale } from '#/content/locale'
 import {
-  Badge,
   Grid,
   GridCell,
   GridCrosses,
@@ -19,14 +19,9 @@ import {
   GridSystem,
 } from '#/geist/components'
 import { portraitAscii, portraitAsciiColumns } from '#/link-hub/portrait-ascii'
-import { easeOut, itemVariants, springDefault } from '#/link-hub/motion'
+import { easeOut, springDefault } from '#/link-hub/motion'
 import { tileArt } from '#/link-hub/tile-art'
-import {
-  AvailabilityPulse,
-  ButtonTile,
-  LinkTile,
-  SwitchTile,
-} from '#/link-hub/tiles'
+import { ButtonTile, LinkTile, StaticTile, SwitchTile } from '#/link-hub/tiles'
 
 export type LinkHubPageProps = {
   locale: Locale
@@ -164,55 +159,48 @@ export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
             <Grid
               className="hub-grid"
               columns={{ sm: 1, md: 2, lg: 4 }}
-              rows={{ sm: 13, md: 8, lg: 4 }}
+              rows={{ sm: 15, md: 8, lg: 4 }}
             >
               <GridCrosses />
 
               <main className="contents">
                 <section aria-label="Identity" className="contents">
-                  <GridCell
-                    column={{ sm: 1, md: 1, lg: '1 / 4' }}
-                    row={{ sm: 1, md: '1 / 3', lg: 1 }}
-                  >
-                    <motion.div
-                      initial="hidden"
-                      animate="visible"
-                      variants={{
-                        hidden: {},
-                        visible: { transition: { staggerChildren: 0.04 } },
+                  <GridCell>
+                    <StaticTile
+                      titleAs="h1"
+                      copy={{
+                        label: identity.role,
+                        title: identity.displayName,
                       }}
-                      className="flex h-full min-h-0 flex-col justify-center gap-3 overflow-hidden px-5 py-5 lg:px-8 lg:py-6"
-                    >
-                      <motion.div variants={itemVariants}>
-                        <Badge variant="gray" contrast="low">
-                          {identity.role}
-                        </Badge>
-                      </motion.div>
-                      <motion.h1
-                        variants={itemVariants}
-                        className="display-title text-4xl text-[var(--hub-fg)] md:text-5xl lg:text-6xl"
-                      >
-                        {identity.displayName}
-                      </motion.h1>
-                      <motion.p
-                        variants={itemVariants}
-                        className="text-copy-16 max-w-prose text-[var(--hub-muted)]"
-                      >
-                        {identity.bio}
-                      </motion.p>
-                      <motion.div variants={itemVariants}>
-                        <Badge variant="green">
-                          <AvailabilityPulse />
-                          {identity.availability}
-                        </Badge>
-                      </motion.div>
-                    </motion.div>
+                    />
                   </GridCell>
-                  <GridCell
-                    column={{ sm: 1, md: 2, lg: 4 }}
-                    row={{ sm: 2, md: '1 / 3', lg: 1 }}
-                  >
+                  <GridCell>
+                    <StaticTile
+                      showLabel={false}
+                      align="left"
+                      copy={{
+                        label: identity.bioLabel,
+                        title: identity.bio,
+                      }}
+                    />
+                  </GridCell>
+                  <GridCell>
                     <AsciiPortrait alt={identity.portraitAlt} />
+                  </GridCell>
+                  <GridCell>
+                    <LinkTile
+                      link={{ id: 'resume', href: resumeHref }}
+                      copy={{
+                        ...locale.links.resume,
+                        title: identity.availability,
+                      }}
+                      onActivate={() =>
+                        analytics.track({
+                          type: 'link_click',
+                          linkId: 'resume',
+                        })
+                      }
+                    />
                   </GridCell>
                 </section>
 
