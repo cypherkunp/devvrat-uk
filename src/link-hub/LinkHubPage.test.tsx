@@ -62,8 +62,8 @@ describe('Link Hub page', () => {
     const { locale } = renderPage()
     const footer = screen.getByRole('contentinfo')
 
-    expect(footer.textContent).toContain(locale.footer.credit)
-    expect(footer.textContent).toContain(locale.footer.rights)
+    expect(footer.textContent).toContain(`${locale.footer.credit}. ${locale.footer.rights}`)
+    expect(footer.querySelectorAll('p')).toHaveLength(1)
     expect(footer.closest('main')).toBeNull()
   })
 

@@ -95,12 +95,10 @@ function AsciiPortrait({ alt }: { alt: string }) {
 
 function HubFooter({ credit, rights }: Locale['footer']) {
   return (
-    <footer className="flex h-full min-h-16 items-center justify-center gap-x-2 px-4 py-3 text-[var(--hub-muted)]">
-      <span className="text-label-12-mono">{credit}</span>
-      <span aria-hidden="true" className="text-label-12 opacity-40">
-        ·
-      </span>
-      <span className="text-label-12-mono">{rights}</span>
+    <footer className="tile tile-static flex h-full min-h-16 w-full items-center px-4 py-3 text-left text-[var(--hub-muted)] md:text-center">
+      <p className="text-label-12-mono w-full">
+        {credit}. {rights}
+      </p>
     </footer>
   )
 }
@@ -159,7 +157,7 @@ export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
             <Grid
               className="hub-grid"
               columns={{ sm: 1, md: 2, lg: 4 }}
-              rows={{ sm: 15, md: 8, lg: 4 }}
+              rows={{ sm: 16, md: 8, lg: 4 }}
             >
               <GridCrosses />
 
@@ -278,7 +276,10 @@ export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
                 </section>
               </main>
 
-              <GridCell column={{ sm: 1, md: '1 / 3', lg: '3 / 5' }}>
+              <GridCell>
+                <div className="h-full min-h-16" aria-hidden="true" />
+              </GridCell>
+              <GridCell>
                 <HubFooter
                   credit={locale.footer.credit}
                   rights={locale.footer.rights}
