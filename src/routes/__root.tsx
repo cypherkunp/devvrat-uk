@@ -2,9 +2,11 @@ import { lazy, Suspense } from 'react'
 import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
 
 import { loadLocale } from '#/content/locale'
+import { linkHubHead } from '#/content/seo'
 import appCss from '../styles.css?url'
 
 const locale = loadLocale('en')
+const seo = linkHubHead(locale)
 
 const AppDevtools = import.meta.env.DEV
   ? lazy(() => import('#/devtools').then((m) => ({ default: m.AppDevtools })))
@@ -27,6 +29,7 @@ export const Route = createRootRoute({
       {
         title: locale.meta.documentTitle,
       },
+      ...seo.meta,
       {
         name: 'theme-color',
         content: '#ffffff',
@@ -61,7 +64,9 @@ export const Route = createRootRoute({
         rel: 'manifest',
         href: '/manifest.json',
       },
+      ...seo.links,
     ],
+    scripts: seo.scripts,
   }),
   shellComponent: RootDocument,
 })

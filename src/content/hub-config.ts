@@ -22,6 +22,8 @@ export type HubLink = ConfiguredLink | PlaceholderLink
 
 export type ActionId = 'copy-url' | 'mono' | 'dark'
 
+export const hubOrigin = 'https://devvrat.uk'
+
 export const resumeHref = 'https://www.devvrat.cc/resume'
 
 export const copyUrlActionId = 'copy-url' as const satisfies ActionId

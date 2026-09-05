@@ -48,6 +48,7 @@ export type Locale = {
   }
   meta: {
     documentTitle: string
+    description: string
   }
 }
 

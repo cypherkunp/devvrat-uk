@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 
 import { createAnalyticsFromEnv } from '#/analytics/create'
+import { hubOrigin } from '#/content/hub-config'
 import { loadLocale } from '#/content/locale'
 import { LinkHubPage } from '#/link-hub/LinkHubPage'
 
@@ -12,9 +13,7 @@ function LinkHubRoute() {
   const analytics = useMemo(() => createAnalyticsFromEnv(), [])
 
   const hubUrl =
-    typeof window !== 'undefined'
-      ? window.location.origin
-      : 'https://devvrat.uk'
+    typeof window !== 'undefined' ? window.location.origin : hubOrigin
 
   return <LinkHubPage locale={locale} analytics={analytics} hubUrl={hubUrl} />
 }
