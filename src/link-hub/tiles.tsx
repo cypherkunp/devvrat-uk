@@ -15,7 +15,7 @@ export function tileClass(
   return [
     'tile group relative isolate flex h-full min-h-24 w-full flex-col px-4 py-3.5',
     align === 'center'
-      ? 'items-center justify-center gap-3 text-center'
+      ? 'items-start justify-center gap-3 text-left md:items-center md:text-center'
       : staticTile
         ? 'items-start justify-center text-left'
         : 'text-left',
