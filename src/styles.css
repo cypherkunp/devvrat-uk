@@ -1,5 +1,28 @@
 @import 'tailwindcss';
 
+@theme {
+  --font-sans: 'Geist Sans', system-ui, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, monospace;
+}
+
+@font-face {
+  font-family: 'Geist Sans';
+  src: url('../node_modules/geist/dist/fonts/geist-sans/Geist-Variable.woff2')
+    format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Geist Mono';
+  src: url('../node_modules/geist/dist/fonts/geist-mono/GeistMono-Variable.woff2')
+    format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -12,144 +35,389 @@ body,
 
 :root {
   color-scheme: light;
-  --hub-bg: #f5f5f7;
-  --hub-fg: #1d1d1f;
-  --hub-muted: #6e6e73;
-  --hub-hairline: rgba(0, 0, 0, 0.08);
-  --hub-fill: rgba(255, 255, 255, 0.72);
-  --hub-fill-solid: #ffffff;
-  --hub-fill-heavy: rgba(255, 255, 255, 0.78);
-  --hub-border: rgba(255, 255, 255, 0.7);
-  --hub-border-top: rgba(255, 255, 255, 0.95);
-  --hub-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
-  --hub-shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.04),
-    0 16px 40px rgba(0, 0, 0, 0.1);
-  --hub-accent: #0071e3;
-  --hub-ok: #34c759;
-  --hub-ok-fg: #1b7a36;
-  --hub-pending: #ff9f0a;
-  --hub-mix: #ffffff;
-  --hub-blob-a: #d2e3fc;
-  --hub-blob-b: #e8e8ed;
-  --hub-portrait-bg: #e8e8ed;
-  --hub-portrait-veil: rgba(245, 245, 247, 0.55);
-  /* Strong ease-out — built-ins are too weak for UI punch. */
+  --ds-background-100: #ffffff;
+  --ds-background-200: #fafafa;
+  --ds-gray-100: #f2f2f2;
+  --ds-gray-200: #ebebeb;
+  --ds-gray-300: #e8e8e8;
+  --ds-gray-400: #e5e5e5;
+  --ds-gray-500: #c9c9c9;
+  --ds-gray-600: #8f8f8f;
+  --ds-gray-700: #7d7d7d;
+  --ds-gray-800: #666666;
+  --ds-gray-900: #666666;
+  --ds-gray-1000: #171717;
+  --ds-gray-alpha-400: rgba(0, 0, 0, 0.08);
+  --ds-blue-100: #eaf5ff;
+  --ds-blue-700: #0072f5;
+  --ds-blue-900: #0068d6;
+  --ds-green-100: #eafff1;
+  --ds-green-700: #1a8f3f;
+  --ds-green-900: #0f7a32;
+  --ds-amber-100: #fff6e5;
+  --ds-amber-700: #d7890a;
+  --ds-amber-900: #a16207;
+  --ds-purple-100: #f8edfc;
+  --ds-purple-700: #8e4ec6;
+  --ds-guide: var(--ds-gray-400);
+  --ds-cross: var(--ds-gray-800);
+  --hub-bg: var(--ds-background-100);
+  --hub-fg: var(--ds-gray-1000);
+  --hub-muted: var(--ds-gray-900);
+  --hub-accent: var(--ds-blue-700);
+  --hub-ok: var(--ds-green-700);
+  --hub-ok-fg: var(--ds-green-900);
+  --hub-pending: var(--ds-amber-700);
+  --hub-portrait-bg: var(--ds-gray-100);
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
-/* Dark tokens: OS default (no session attr) or session override on .hub-stage. */
 @media (prefers-color-scheme: dark) {
   :root:not(:has([data-scheme='light'])) {
     color-scheme: dark;
-    --hub-bg: #000000;
-    --hub-fg: #f5f5f7;
-    --hub-muted: #86868b;
-    --hub-hairline: rgba(255, 255, 255, 0.12);
-    --hub-fill: rgba(44, 44, 46, 0.72);
-    --hub-fill-solid: #1c1c1e;
-    --hub-fill-heavy: rgba(28, 28, 30, 0.78);
-    --hub-border: rgba(255, 255, 255, 0.12);
-    --hub-border-top: rgba(255, 255, 255, 0.22);
-    --hub-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.45);
-    --hub-shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.45),
-      0 16px 40px rgba(0, 0, 0, 0.55);
-    --hub-accent: #0a84ff;
-    --hub-ok: #30d158;
-    --hub-ok-fg: #30d158;
-    --hub-pending: #ff9f0a;
-    --hub-mix: #000000;
-    --hub-blob-a: #0a3166;
-    --hub-blob-b: #1c1c1e;
-    --hub-portrait-bg: #2c2c2e;
-    --hub-portrait-veil: rgba(0, 0, 0, 0.55);
+    --ds-background-100: #000000;
+    --ds-background-200: #0a0a0a;
+    --ds-gray-100: #111111;
+    --ds-gray-200: #1a1a1a;
+    --ds-gray-300: #262626;
+    --ds-gray-400: #2e2e2e;
+    --ds-gray-500: #454545;
+    --ds-gray-600: #707070;
+    --ds-gray-700: #8a8a8a;
+    --ds-gray-800: #a0a0a0;
+    --ds-gray-900: #a1a1a1;
+    --ds-gray-1000: #ededed;
+    --ds-gray-alpha-400: rgba(255, 255, 255, 0.14);
+    --ds-blue-100: #0b1f33;
+    --ds-blue-700: #0a84ff;
+    --ds-blue-900: #47a8ff;
+    --ds-green-100: #0b2414;
+    --ds-green-700: #1a9338;
+    --ds-green-900: #3dd68c;
+    --ds-amber-100: #271b05;
+    --ds-amber-700: #f5a524;
+    --ds-amber-900: #f5a524;
+    --ds-purple-100: #241330;
+    --ds-purple-700: #bf5af2;
+    --ds-guide: rgba(255, 255, 255, 0.14);
+    --ds-cross: rgba(255, 255, 255, 0.55);
+    --hub-ok-fg: var(--ds-green-900);
+    --hub-portrait-bg: var(--ds-gray-200);
   }
 }
 
 :root:has([data-scheme='dark']) {
   color-scheme: dark;
-  --hub-bg: #000000;
-  --hub-fg: #f5f5f7;
-  --hub-muted: #86868b;
-  --hub-hairline: rgba(255, 255, 255, 0.12);
-  --hub-fill: rgba(44, 44, 46, 0.72);
-  --hub-fill-solid: #1c1c1e;
-  --hub-fill-heavy: rgba(28, 28, 30, 0.78);
-  --hub-border: rgba(255, 255, 255, 0.12);
-  --hub-border-top: rgba(255, 255, 255, 0.22);
-  --hub-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.45);
-  --hub-shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.45),
-    0 16px 40px rgba(0, 0, 0, 0.55);
-  --hub-accent: #0a84ff;
-  --hub-ok: #30d158;
-  --hub-ok-fg: #30d158;
-  --hub-pending: #ff9f0a;
-  --hub-mix: #000000;
-  --hub-blob-a: #0a3166;
-  --hub-blob-b: #1c1c1e;
-  --hub-portrait-bg: #2c2c2e;
-  --hub-portrait-veil: rgba(0, 0, 0, 0.55);
+  --ds-background-100: #000000;
+  --ds-background-200: #0a0a0a;
+  --ds-gray-100: #111111;
+  --ds-gray-200: #1a1a1a;
+  --ds-gray-300: #262626;
+  --ds-gray-400: #2e2e2e;
+  --ds-gray-500: #454545;
+  --ds-gray-600: #707070;
+  --ds-gray-700: #8a8a8a;
+  --ds-gray-800: #a0a0a0;
+  --ds-gray-900: #a1a1a1;
+  --ds-gray-1000: #ededed;
+  --ds-gray-alpha-400: rgba(255, 255, 255, 0.14);
+  --ds-blue-100: #0b1f33;
+  --ds-blue-700: #0a84ff;
+  --ds-blue-900: #47a8ff;
+  --ds-green-100: #0b2414;
+  --ds-green-700: #1a9338;
+  --ds-green-900: #3dd68c;
+  --ds-amber-100: #271b05;
+  --ds-amber-700: #f5a524;
+  --ds-amber-900: #f5a524;
+  --ds-purple-100: #241330;
+  --ds-purple-700: #bf5af2;
+  --ds-guide: rgba(255, 255, 255, 0.14);
+  --ds-cross: rgba(255, 255, 255, 0.55);
+  --hub-ok-fg: var(--ds-green-900);
+  --hub-portrait-bg: var(--ds-gray-200);
 }
 
 body {
   margin: 0;
-  background: var(--hub-bg);
-  color: var(--hub-fg);
-  font: 100% / 1.47 -apple-system, BlinkMacSystemFont, 'SF Pro Text',
-    'Segoe UI', system-ui, sans-serif;
+  background: var(--ds-background-100);
+  color: var(--ds-gray-1000);
+  font-family: var(--font-sans);
+  font-feature-settings:
+    'kern' 1,
+    'ss01' 1;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
-/* Display name: tighten tracking as size grows (Apple UI Typography). */
+.text-heading-48 {
+  font-size: 3rem;
+  font-weight: 600;
+  letter-spacing: -0.049em;
+  line-height: 1.1;
+}
+
+.text-heading-32 {
+  font-size: 2rem;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 1.2;
+}
+
+.text-copy-16 {
+  font-size: 1rem;
+  font-weight: 400;
+  letter-spacing: -0.011em;
+  line-height: 1.5;
+}
+
+.text-copy-14 {
+  font-size: 0.875rem;
+  letter-spacing: -0.006em;
+  line-height: 1.5;
+}
+
+.text-label-14 {
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: -0.006em;
+  line-height: 1.25rem;
+}
+
+.text-label-13 {
+  font-size: 0.8125rem;
+  letter-spacing: 0;
+  line-height: 1.25rem;
+}
+
+.text-label-12 {
+  font-size: 0.75rem;
+  letter-spacing: 0.01em;
+  line-height: 1rem;
+}
+
+.text-label-13-mono,
+.text-label-12-mono {
+  font-family: 'Geist Mono', ui-monospace, monospace;
+}
+
+.text-label-13-mono {
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
+}
+
+.text-label-12-mono {
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
 .display-title {
   font-weight: 600;
-  letter-spacing: -0.022em;
+  letter-spacing: -0.049em;
   line-height: 1.05;
   font-optical-sizing: auto;
 }
 
 @media (min-width: 768px) {
   .display-title {
-    letter-spacing: -0.028em;
+    letter-spacing: -0.052em;
+  }
+}
+
+.geist-grid-page {
+  min-height: 100dvh;
+  background: var(--ds-background-100);
+}
+
+.geist-grid-system {
+  padding: 12px;
+}
+
+.geist-grid-system[data-container] {
+  container-type: inline-size;
+}
+
+.geist-grid-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.geist-grid {
+  display: grid;
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  grid-template-columns: repeat(var(--grid-cols-sm, 1), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--grid-rows-sm, 1), minmax(0, auto));
+}
+
+@media (min-width: 768px) {
+  .geist-grid {
+    grid-template-columns: repeat(
+      var(--grid-cols-md, var(--grid-cols-sm, 1)),
+      minmax(0, 1fr)
+    );
+    grid-template-rows: repeat(
+      var(--grid-rows-md, var(--grid-rows-sm, 1)),
+      minmax(0, auto)
+    );
   }
 }
 
 @media (min-width: 1024px) {
-  .display-title {
-    letter-spacing: -0.032em;
+  .geist-grid {
+    grid-template-columns: repeat(
+      var(--grid-cols-lg, var(--grid-cols-md, var(--grid-cols-sm, 1))),
+      minmax(0, 1fr)
+    );
+    grid-template-rows: repeat(
+      var(--grid-rows-lg, var(--grid-rows-md, var(--grid-rows-sm, 1))),
+      minmax(0, 1fr)
+    );
   }
 }
 
-/* Material surfaces — frosted layer, content scrolls under conceptually. */
-.material {
-  background: var(--hub-fill);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid var(--hub-border);
-  box-shadow: var(--hub-shadow);
+.geist-grid-cell {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  min-height: 0;
+  grid-column: var(--cell-col-sm, auto);
+  grid-row: var(--cell-row-sm, auto);
 }
 
-.material-heavy {
-  background: var(--hub-fill-heavy);
-  backdrop-filter: blur(40px) saturate(180%);
-  -webkit-backdrop-filter: blur(40px) saturate(180%);
-  border: 1px solid var(--hub-border);
-  box-shadow: var(--hub-shadow);
-  /* Bright top edge — light catching the material (Apple materials). */
-  border-top-color: var(--hub-border-top);
+@media (min-width: 768px) {
+  .geist-grid-cell {
+    grid-column: var(--cell-col-md, var(--cell-col-sm, auto));
+    grid-row: var(--cell-row-md, var(--cell-row-sm, auto));
+  }
 }
 
-/* Mono toggle: state indication via filter settle (occasional action). */
+@media (min-width: 1024px) {
+  .geist-grid-cell {
+    overflow: hidden;
+    grid-column: var(
+      --cell-col-lg,
+      var(--cell-col-md, var(--cell-col-sm, auto))
+    );
+    grid-row: var(--cell-row-lg, var(--cell-row-md, var(--cell-row-sm, auto)));
+  }
+}
+
+.geist-grid-cell[data-solid] {
+  background: var(--ds-background-100);
+}
+
+.geist-guides,
+.geist-crosses {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.geist-guides {
+  z-index: 0;
+}
+
+.geist-crosses {
+  z-index: 3;
+  overflow: visible;
+}
+
+.geist-guide {
+  position: absolute;
+  background: var(--ds-guide);
+}
+
+.geist-guide-col {
+  top: 0;
+  transform: translateX(-50%);
+}
+
+.geist-guide-row {
+  left: 0;
+  transform: translateY(-50%);
+}
+
+.geist-guide[data-dashed].geist-guide-col {
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--ds-guide) 0 4px,
+    transparent 4px 8px
+  );
+}
+
+.geist-guide[data-dashed].geist-guide-row {
+  background: repeating-linear-gradient(
+    to right,
+    var(--ds-guide) 0 4px,
+    transparent 4px 8px
+  );
+}
+
+.geist-grid-system[data-debug] .geist-guide {
+  background: var(--ds-blue-700);
+}
+
+/* Plus matches the Geist demo: same 1px stroke as the guides, ~11px arms. */
+.geist-grid-cross {
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  transform: translate(-50%, -50%);
+}
+
+.geist-grid-cross::before,
+.geist-grid-cross::after {
+  content: '';
+  position: absolute;
+  background: var(--ds-cross);
+}
+
+.geist-grid-cross::before {
+  left: 50%;
+  top: 0;
+  width: 1px;
+  height: 100%;
+  transform: translateX(-50%);
+}
+
+.geist-grid-cross::after {
+  top: 50%;
+  left: 0;
+  height: 1px;
+  width: 100%;
+  transform: translateY(-50%);
+}
+
+.hub-grid {
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .hub-grid,
+  .hub-grid .geist-grid {
+    height: calc(100dvh - 24px);
+    max-height: calc(100dvh - 24px);
+  }
+
+  .hub-grid .geist-grid {
+    grid-template-rows: minmax(0, 1.55fr) repeat(3, minmax(0, 1fr));
+  }
+
+  .hub-grid .tile {
+    min-height: 0;
+  }
+}
+
 .hub-stage {
   transition: filter 220ms var(--ease-out);
 }
 
-/* Tile hover/press live in CSS so Motion only owns entrance.
-   Hover is gated: touch devices must not sticky-lift on tap. */
 .tile {
   transition:
     transform 160ms var(--ease-out),
-    box-shadow 200ms var(--ease-out);
+    background-color 160ms var(--ease-out);
   width: 100%;
 }
 
@@ -158,14 +426,7 @@ body {
   transition-duration: 100ms;
 }
 
-.tile-glyph {
-  transition:
-    transform 200ms var(--ease-out),
-    opacity 200ms var(--ease-out);
-}
-
 .tile-arrow {
-  /* Color uses ease (hover); transform keeps strong ease-out. */
   transition:
     transform 160ms var(--ease-out),
     color 160ms ease;
@@ -173,32 +434,92 @@ body {
 
 @media (hover: hover) and (pointer: fine) {
   .tile:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--hub-shadow-lift);
+    background-color: var(--ds-gray-100);
   }
 
   .tile:hover:active {
     transform: scale(0.97);
   }
 
-  .tile:hover .tile-glyph {
-    transform: scale(1.05);
-    opacity: 0.12;
-  }
-
   .tile:hover .tile-arrow {
     transform: translateX(2px);
-    color: var(--hub-fg);
+    color: var(--ds-gray-1000);
   }
 }
 
-/* Monochrome: desaturate accents; independent of scheme. */
+.geist-badge {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  gap: 0.375rem;
+  border-radius: 6px;
+  padding: 0.125rem 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1.25rem;
+}
+
+.geist-badge[data-variant='gray'] {
+  background: var(--ds-gray-100);
+  color: var(--ds-gray-1000);
+}
+
+.geist-badge[data-variant='gray'][data-contrast='low'] {
+  background: var(--ds-gray-100);
+  color: var(--ds-gray-900);
+}
+
+.geist-badge[data-variant='green'] {
+  background: var(--ds-green-100);
+  color: var(--ds-green-900);
+}
+
+.geist-badge[data-variant='blue'] {
+  background: var(--ds-blue-100);
+  color: var(--ds-blue-900);
+}
+
+.geist-badge[data-variant='amber'] {
+  background: var(--ds-amber-100);
+  color: var(--ds-amber-900);
+}
+
+.geist-toggle {
+  position: relative;
+  display: inline-block;
+  height: 16px;
+  width: 28px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: var(--ds-gray-400);
+  transition: background-color 160ms var(--ease-out);
+}
+
+.geist-toggle[data-on] {
+  background: var(--ds-gray-1000);
+}
+
+.geist-toggle::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: var(--ds-background-100);
+  transition: transform 160ms var(--ease-out);
+}
+
+.geist-toggle[data-on]::before {
+  transform: translateX(12px);
+}
+
 [data-mono='true'] {
   filter: grayscale(1) contrast(1.05);
 }
 
-/* Motion is enhancement: CSS transitions/animations collapse for reduced-motion
-   visitors. Motion-library animation is handled by MotionConfig reducedMotion. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -207,24 +528,5 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
-  }
-}
-
-@media (prefers-reduced-transparency: reduce) {
-  .material,
-  .material-heavy {
-    background: var(--hub-fill-solid);
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-  }
-}
-
-@media (prefers-contrast: more) {
-  .material,
-  .material-heavy {
-    background: var(--hub-fill-solid);
-    border-color: var(--hub-fg);
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
   }
 }

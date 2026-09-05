@@ -10,15 +10,16 @@ import {
 } from '#/content/hub-config'
 import type { ConfiguredLink, HubLink } from '#/content/hub-config'
 import type { Locale } from '#/content/locale'
-import { portraitAscii, portraitAsciiColumns } from '#/link-hub/portrait-ascii'
 import {
-  groupVariants,
-  itemVariants,
-  mainVariants,
-  pageVariants,
-  panelVariants,
-  springDefault,
-} from '#/link-hub/motion'
+  Badge,
+  Grid,
+  GridCell,
+  GridCrosses,
+  GridPage,
+  GridSystem,
+} from '#/geist/components'
+import { portraitAscii, portraitAsciiColumns } from '#/link-hub/portrait-ascii'
+import { easeOut, itemVariants, springDefault } from '#/link-hub/motion'
 import { tileArt } from '#/link-hub/tile-art'
 import {
   AvailabilityPulse,
@@ -81,7 +82,7 @@ function AsciiPortrait({ alt }: { alt: string }) {
     <span
       role="img"
       aria-label={alt}
-      className="@container relative isolate block size-64 overflow-hidden rounded-[1.75rem] bg-[var(--hub-portrait-bg)] md:size-72 lg:size-[clamp(11rem,24vh,18rem)]"
+      className="@container relative isolate flex size-full min-h-64 items-center justify-center overflow-hidden md:min-h-0"
     >
       <pre
         aria-hidden="true"
@@ -93,31 +94,19 @@ function AsciiPortrait({ alt }: { alt: string }) {
       >
         {portraitAscii}
       </pre>
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 [background:radial-gradient(circle_at_50%_38%,transparent_42%,var(--hub-portrait-veil)_100%)]"
-      />
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-[var(--hub-bg)] to-transparent"
-      />
     </span>
   )
 }
 
-/** Sits outside <main> so it reads as the page's contentinfo landmark. */
 function HubFooter({ credit, rights }: Locale['footer']) {
   return (
-    <motion.footer
-      variants={itemVariants}
-      className="relative z-10 mx-auto flex w-full max-w-6xl shrink-0 flex-wrap items-center justify-center gap-x-2 gap-y-1 px-6 pb-8 text-[0.75rem] tracking-[0.01em] text-[var(--hub-muted)] lg:px-10 lg:pb-6"
-    >
-      <span>{credit}</span>
-      <span aria-hidden="true" className="opacity-40">
+    <footer className="flex h-full min-h-16 items-center justify-center gap-x-2 px-4 py-3 text-[var(--hub-muted)]">
+      <span className="text-label-12-mono">{credit}</span>
+      <span aria-hidden="true" className="text-label-12 opacity-40">
         ·
       </span>
-      <span>{rights}</span>
-    </motion.footer>
+      <span className="text-label-12-mono">{rights}</span>
+    </footer>
   )
 }
 
@@ -144,7 +133,6 @@ export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
     try {
       await navigator.clipboard.writeText(hubUrl)
     } catch {
-      // A denied clipboard leaves the hub as it was: no feedback, no event.
       return
     }
     showCopyFeedback(copyAction.success)
@@ -164,124 +152,153 @@ export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
   return (
     <MotionConfig reducedMotion="user" transition={springDefault}>
       <motion.div
-        initial="hidden"
-        animate="visible"
-        variants={pageVariants}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.22, ease: easeOut }}
         data-mono={monochrome ? 'true' : undefined}
         data-scheme={schemeOverride ?? undefined}
-        className="hub-stage relative flex min-h-dvh flex-col bg-[var(--hub-bg)] text-[var(--hub-fg)] lg:h-dvh"
+        className="hub-stage min-h-dvh bg-[var(--hub-bg)] text-[var(--hub-fg)]"
       >
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 overflow-hidden"
-        >
-          <span className="absolute -top-40 left-1/2 size-[42rem] -translate-x-1/2 rounded-full bg-[color-mix(in_srgb,var(--hub-blob-a)_50%,transparent)] blur-[120px]" />
-          <span className="absolute right-[-10%] bottom-[-8%] size-[28rem] rounded-full bg-[color-mix(in_srgb,var(--hub-blob-b)_80%,transparent)] blur-[100px]" />
-        </span>
-
-        <motion.main
-          variants={mainVariants}
-          className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col gap-10 px-6 pt-12 pb-8 lg:min-h-0 lg:justify-center lg:gap-8 lg:px-10 lg:pt-10 lg:pb-6"
-        >
-          <motion.section
-            aria-label="Identity"
-            variants={panelVariants}
-            className="material-heavy relative isolate flex shrink-0 flex-col gap-8 rounded-[1.75rem] px-6 py-8 md:flex-row md:items-center md:justify-between md:gap-12 md:px-10 md:py-8 lg:py-6"
-          >
-            <motion.div
-              variants={groupVariants}
-              className="flex min-w-0 flex-1 flex-col items-start gap-4 lg:gap-3"
+        <GridPage>
+          <GridSystem guideWidth={1} unstable_useContainer>
+            <Grid
+              className="hub-grid"
+              columns={{ sm: 1, md: 2, lg: 4 }}
+              rows={{ sm: 13, md: 8, lg: 4 }}
             >
-              <motion.p
-                variants={itemVariants}
-                className="inline-flex max-w-full items-center rounded-full bg-[color-mix(in_srgb,var(--hub-accent)_10%,var(--hub-mix))] px-3 py-1 text-[0.75rem] font-medium tracking-[0.01em] text-[var(--hub-accent)]"
-              >
-                {identity.role}
-              </motion.p>
-              <motion.h1
-                variants={itemVariants}
-                className="display-title text-4xl text-[var(--hub-fg)] md:text-5xl lg:text-6xl"
-              >
-                {identity.displayName}
-              </motion.h1>
-              <motion.p
-                variants={itemVariants}
-                className="max-w-prose text-lg leading-relaxed tracking-[0.01em] text-[var(--hub-muted)]"
-              >
-                {identity.bio}
-              </motion.p>
-              <motion.p
-                variants={itemVariants}
-                className="inline-flex items-center gap-2 rounded-full bg-[color-mix(in_srgb,var(--hub-ok)_12%,var(--hub-mix))] px-3 py-1 text-[0.8125rem] font-medium tracking-[0.01em] text-[var(--hub-ok-fg)]"
-              >
-                <AvailabilityPulse />
-                {identity.availability}
-              </motion.p>
-            </motion.div>
+              <GridCrosses />
 
-            <motion.div
-              variants={itemVariants}
-              className="relative shrink-0 self-center"
-            >
-              <AsciiPortrait alt={identity.portraitAlt} />
-            </motion.div>
-          </motion.section>
+              <main className="contents">
+                <section aria-label="Identity" className="contents">
+                  <GridCell
+                    column={{ sm: 1, md: 1, lg: '1 / 4' }}
+                    row={{ sm: 1, md: '1 / 3', lg: 1 }}
+                  >
+                    <motion.div
+                      initial="hidden"
+                      animate="visible"
+                      variants={{
+                        hidden: {},
+                        visible: { transition: { staggerChildren: 0.04 } },
+                      }}
+                      className="flex h-full min-h-0 flex-col justify-center gap-3 overflow-hidden px-5 py-5 lg:px-8 lg:py-6"
+                    >
+                      <motion.div variants={itemVariants}>
+                        <Badge variant="gray" contrast="low">
+                          {identity.role}
+                        </Badge>
+                      </motion.div>
+                      <motion.h1
+                        variants={itemVariants}
+                        className="display-title text-4xl text-[var(--hub-fg)] md:text-5xl lg:text-6xl"
+                      >
+                        {identity.displayName}
+                      </motion.h1>
+                      <motion.p
+                        variants={itemVariants}
+                        className="text-copy-16 max-w-prose text-[var(--hub-muted)]"
+                      >
+                        {identity.bio}
+                      </motion.p>
+                      <motion.div variants={itemVariants}>
+                        <Badge variant="green">
+                          <AvailabilityPulse />
+                          {identity.availability}
+                        </Badge>
+                      </motion.div>
+                    </motion.div>
+                  </GridCell>
+                  <GridCell
+                    column={{ sm: 1, md: 2, lg: 4 }}
+                    row={{ sm: 2, md: '1 / 3', lg: 1 }}
+                  >
+                    <AsciiPortrait alt={identity.portraitAlt} />
+                  </GridCell>
+                </section>
 
-          <motion.div
-            variants={groupVariants}
-            className="grid auto-rows-fr grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4"
-          >
-            <section aria-label="Links" className="contents">
-              {hubLinks.map((link) =>
-                isConfigured(link) ? (
-                  <LinkTile
-                    key={link.id}
-                    link={link}
-                    copy={locale.links[link.id]}
-                    onActivate={() =>
-                      analytics.track({ type: 'link_click', linkId: link.id })
-                    }
-                  />
-                ) : (
-                  <ButtonTile
-                    key={link.id}
-                    art={tileArt.photos}
-                    copy={{ label: photosCopy.label, title: photosCopy.title }}
-                    message={photosMessage}
-                    tone="pending"
-                    onActivate={() => showPhotosMessage(photosCopy.comingSoon)}
-                  />
-                ),
-              )}
-            </section>
+                <section aria-label="Links" className="contents">
+                  {hubLinks.map((link) =>
+                    isConfigured(link) ? (
+                      <GridCell key={link.id}>
+                        <LinkTile
+                          link={link}
+                          copy={locale.links[link.id]}
+                          onActivate={() =>
+                            analytics.track({
+                              type: 'link_click',
+                              linkId: link.id,
+                            })
+                          }
+                        />
+                      </GridCell>
+                    ) : (
+                      <GridCell key={link.id}>
+                        <ButtonTile
+                          art={tileArt.photos}
+                          copy={{
+                            label: photosCopy.label,
+                            title: photosCopy.title,
+                          }}
+                          message={photosMessage}
+                          tone="pending"
+                          onActivate={() =>
+                            showPhotosMessage(photosCopy.comingSoon)
+                          }
+                        />
+                      </GridCell>
+                    ),
+                  )}
+                </section>
 
-            <section aria-label="Actions" className="contents">
-              <ButtonTile
-                art={tileArt[copyUrlActionId]}
-                copy={{ label: copyAction.label, title: copyAction.title }}
-                message={copyFeedback}
-                tone="ok"
-                onActivate={() => {
-                  void copyHubUrl()
-                }}
-              />
-              <SwitchTile
-                art={tileArt[monoActionId]}
-                copy={{ label: monoAction.label, title: monoAction.title }}
-                checked={monochrome}
-                onCheckedChange={toggleMonochrome}
-              />
-              <SwitchTile
-                art={tileArt[darkActionId]}
-                copy={{ label: darkAction.label, title: darkAction.title }}
-                checked={dark}
-                onCheckedChange={toggleDark}
-              />
-            </section>
-          </motion.div>
-        </motion.main>
+                <section aria-label="Actions" className="contents">
+                  <GridCell>
+                    <ButtonTile
+                      art={tileArt[copyUrlActionId]}
+                      copy={{
+                        label: copyAction.label,
+                        title: copyAction.title,
+                      }}
+                      message={copyFeedback}
+                      tone="ok"
+                      onActivate={() => {
+                        void copyHubUrl()
+                      }}
+                    />
+                  </GridCell>
+                  <GridCell>
+                    <SwitchTile
+                      art={tileArt[monoActionId]}
+                      copy={{
+                        label: monoAction.label,
+                        title: monoAction.title,
+                      }}
+                      checked={monochrome}
+                      onCheckedChange={toggleMonochrome}
+                    />
+                  </GridCell>
+                  <GridCell>
+                    <SwitchTile
+                      art={tileArt[darkActionId]}
+                      copy={{
+                        label: darkAction.label,
+                        title: darkAction.title,
+                      }}
+                      checked={dark}
+                      onCheckedChange={toggleDark}
+                    />
+                  </GridCell>
+                </section>
+              </main>
 
-        <HubFooter credit={locale.footer.credit} rights={locale.footer.rights} />
+              <GridCell column={{ sm: 1, md: '1 / 3', lg: '3 / 5' }}>
+                <HubFooter
+                  credit={locale.footer.credit}
+                  rights={locale.footer.rights}
+                />
+              </GridCell>
+            </Grid>
+          </GridSystem>
+        </GridPage>
       </motion.div>
     </MotionConfig>
   )

@@ -2,51 +2,27 @@ import { AnimatePresence, motion } from 'motion/react'
 
 import type { ConfiguredLink } from '#/content/hub-config'
 import type { LinkCopy } from '#/content/locale'
-import { feedbackEnter, feedbackExit, itemVariants } from '#/link-hub/motion'
+import { feedbackEnter, feedbackExit } from '#/link-hub/motion'
 import { tileArt } from '#/link-hub/tile-art'
 import type { TileArt } from '#/link-hub/tile-art'
 
-/** Interactive surface — hover/press are CSS so they stay compositor-friendly
- *  and don't fight Motion's entrance transform on the wrapper. */
+/** Interactive surface — hover/press are CSS so they stay compositor-friendly. */
 export function tileClass() {
   return [
-    'tile group relative isolate flex h-full min-h-24 w-full flex-col rounded-2xl px-4 py-3.5 text-left',
-    'material',
-    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--hub-accent)]',
+    'tile group relative isolate flex h-full min-h-24 w-full flex-col px-4 py-3.5 text-left',
+    'focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--ds-blue-700)]',
   ].join(' ')
-}
-
-function cellClass(highlighted?: boolean) {
-  return highlighted ? 'sm:col-span-2' : undefined
 }
 
 function controlLabel({ label, title }: Pick<LinkCopy, 'label' | 'title'>) {
   return `${label}: ${title}`
 }
 
-function TileSurface({ art, wide }: { art: TileArt; wide?: boolean }) {
-  return (
-    <span
-      aria-hidden="true"
-      className="pointer-events-none absolute inset-0 -z-10 overflow-hidden rounded-2xl"
-    >
-      <span
-        className={`tile-glyph absolute -right-6 -bottom-8 size-24 opacity-[0.07] lg:size-28 ${
-          wide ? 'lg:size-36' : ''
-        }`}
-        style={{ color: art.accent }}
-      >
-        {art.glyph}
-      </span>
-    </span>
-  )
-}
-
 function TileChip({ art }: { art: TileArt }) {
   return (
     <span
       aria-hidden="true"
-      className="flex size-9 shrink-0 items-center justify-center rounded-[0.65rem] p-2"
+      className="flex size-8 shrink-0 items-center justify-center rounded-[6px] p-1.5"
       style={{
         color: art.accent,
         backgroundColor: `${art.accent}1f`,
@@ -70,7 +46,7 @@ function TileArrow() {
 
 function TileLabel({ label }: Pick<LinkCopy, 'label'>) {
   return (
-    <span className="min-w-0 flex-1 truncate text-[0.8125rem] font-medium tracking-[0.01em] text-[var(--hub-muted)]">
+    <span className="text-label-13 min-w-0 flex-1 truncate text-[var(--hub-muted)]">
       {label}
     </span>
   )
@@ -79,11 +55,9 @@ function TileLabel({ label }: Pick<LinkCopy, 'label'>) {
 function TileCaption({ title, handle }: Omit<LinkCopy, 'label'>) {
   return (
     <span className="mt-auto block pt-5">
-      <span className="block text-[1.0625rem] font-semibold tracking-[-0.015em] text-[var(--hub-fg)]">
-        {title}
-      </span>
+      <span className="text-label-14 block text-[var(--hub-fg)]">{title}</span>
       {handle ? (
-        <span className="mt-0.5 block text-[0.8125rem] tracking-[0.01em] text-[var(--hub-muted)]">
+        <span className="text-label-13-mono mt-0.5 block text-[var(--hub-muted)]">
           {handle}
         </span>
       ) : null}
@@ -94,12 +68,10 @@ function TileCaption({ title, handle }: Omit<LinkCopy, 'label'>) {
 export type Tone = 'pending' | 'ok'
 
 const toneClass: Record<Tone, string> = {
-  pending:
-    'bg-[color-mix(in_srgb,var(--hub-pending)_14%,var(--hub-mix))] text-[#9a6700]',
-  ok: 'bg-[color-mix(in_srgb,var(--hub-ok)_14%,var(--hub-mix))] text-[var(--hub-ok-fg)]',
+  pending: 'geist-badge',
+  ok: 'geist-badge',
 }
 
-/** Morphs into the caption slot — state indication, not a floating overlay. */
 function StatusMessage({ children, tone }: { children: string; tone: Tone }) {
   return (
     <motion.span
@@ -121,7 +93,8 @@ function StatusMessage({ children, tone }: { children: string; tone: Tone }) {
         transform: 'translateY(4px)',
         transition: feedbackExit,
       }}
-      className={`inline-flex rounded-full px-2.5 py-1 text-[0.6875rem] font-medium tracking-[0.01em] ${toneClass[tone]}`}
+      className={toneClass[tone]}
+      data-variant={tone === 'pending' ? 'amber' : 'green'}
     >
       {children}
     </motion.span>
@@ -140,11 +113,9 @@ function CaptionBody({ title, handle }: Omit<LinkCopy, 'label'>) {
       }}
       className="block"
     >
-      <span className="block text-[1.0625rem] font-semibold tracking-[-0.015em] text-[var(--hub-fg)]">
-        {title}
-      </span>
+      <span className="text-label-14 block text-[var(--hub-fg)]">{title}</span>
       {handle ? (
-        <span className="mt-0.5 block text-[0.8125rem] tracking-[0.01em] text-[var(--hub-muted)]">
+        <span className="text-label-13-mono mt-0.5 block text-[var(--hub-muted)]">
           {handle}
         </span>
       ) : null}
@@ -165,24 +136,21 @@ export function LinkTile({
   const external = link.href.startsWith('http')
 
   return (
-    <motion.div variants={itemVariants} className={cellClass(link.highlighted)}>
-      <a
-        href={link.href}
-        {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-        aria-label={controlLabel(copy)}
-        data-highlighted={link.highlighted ? 'true' : undefined}
-        className={tileClass()}
-        onClick={onActivate}
-      >
-        <TileSurface art={art} wide={link.highlighted} />
-        <span className="flex items-center gap-3">
-          <TileChip art={art} />
-          <TileLabel label={copy.label} />
-          <TileArrow />
-        </span>
-        <TileCaption title={copy.title} handle={copy.handle} />
-      </a>
-    </motion.div>
+    <a
+      href={link.href}
+      {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+      aria-label={controlLabel(copy)}
+      data-highlighted={link.highlighted ? 'true' : undefined}
+      className={tileClass()}
+      onClick={onActivate}
+    >
+      <span className="flex items-center gap-3">
+        <TileChip art={art} />
+        <TileLabel label={copy.label} />
+        <TileArrow />
+      </span>
+      <TileCaption title={copy.title} handle={copy.handle} />
+    </a>
   )
 }
 
@@ -200,57 +168,42 @@ export function ButtonTile({
   onActivate: () => void
 }) {
   return (
-    <motion.div variants={itemVariants}>
-      <button
-        type="button"
-        aria-label={controlLabel(copy)}
-        className={tileClass()}
-        onClick={onActivate}
-      >
-        <TileSurface art={art} />
-        <span className="flex items-center gap-3">
-          <TileChip art={art} />
-          <TileLabel label={copy.label} />
-        </span>
-        {/* Reserved height so morph doesn't reflow the grid. */}
-        <span className="mt-auto block min-h-[2.75rem] pt-5">
-          <AnimatePresence initial={false}>
-            {message ? (
-              <StatusMessage key="status" tone={tone}>
-                {message}
-              </StatusMessage>
-            ) : (
-              <CaptionBody
-                key="caption"
-                title={copy.title}
-                handle={copy.handle}
-              />
-            )}
-          </AnimatePresence>
-        </span>
-      </button>
-    </motion.div>
+    <button
+      type="button"
+      aria-label={controlLabel(copy)}
+      className={tileClass()}
+      onClick={onActivate}
+    >
+      <span className="flex items-center gap-3">
+        <TileChip art={art} />
+        <TileLabel label={copy.label} />
+      </span>
+      <span className="mt-auto block min-h-[2.75rem] pt-5">
+        <AnimatePresence initial={false}>
+          {message ? (
+            <StatusMessage key="status" tone={tone}>
+              {message}
+            </StatusMessage>
+          ) : (
+            <CaptionBody
+              key="caption"
+              title={copy.title}
+              handle={copy.handle}
+            />
+          )}
+        </AnimatePresence>
+      </span>
+    </button>
   )
 }
 
-function AppleSwitch({ on }: { on: boolean }) {
+function GeistToggle({ on }: { on: boolean }) {
   return (
     <span
       aria-hidden="true"
-      className="relative h-[1.75rem] w-[3.1rem] shrink-0 rounded-full"
-      style={{
-        backgroundColor: on ? 'var(--hub-ok)' : 'rgba(120, 120, 128, 0.32)',
-        transition: 'background-color 160ms var(--ease-out)',
-      }}
-    >
-      <span
-        className="absolute top-[0.125rem] size-[1.5rem] rounded-full bg-white shadow-[0_1px_3px_rgba(0,0,0,0.22),0_1px_1px_rgba(0,0,0,0.12)]"
-        style={{
-          transform: on ? 'translateX(1.35rem)' : 'translateX(0.125rem)',
-          transition: 'transform 160ms var(--ease-out)',
-        }}
-      />
-    </span>
+      className="geist-toggle"
+      data-on={on ? '' : undefined}
+    />
   )
 }
 
@@ -266,28 +219,23 @@ export function SwitchTile({
   onCheckedChange: (next: boolean) => void
 }) {
   return (
-    <motion.div variants={itemVariants}>
-      <button
-        type="button"
-        role="switch"
-        aria-checked={checked}
-        aria-label={controlLabel(copy)}
-        className={tileClass()}
-        onClick={() => onCheckedChange(!checked)}
-      >
-        <TileSurface art={art} />
-        <span className="flex items-center gap-3">
-          <TileChip art={art} />
-          <TileLabel label={copy.label} />
-        </span>
-        <span className="mt-auto flex items-end justify-between gap-3 pt-5">
-          <span className="block text-[1.0625rem] font-semibold tracking-[-0.015em] text-[var(--hub-fg)]">
-            {copy.title}
-          </span>
-          <AppleSwitch on={checked} />
-        </span>
-      </button>
-    </motion.div>
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      aria-label={controlLabel(copy)}
+      className={tileClass()}
+      onClick={() => onCheckedChange(!checked)}
+    >
+      <span className="flex items-center gap-3">
+        <TileChip art={art} />
+        <TileLabel label={copy.label} />
+      </span>
+      <span className="mt-auto flex items-end justify-between gap-3 pt-5">
+        <span className="text-label-14 text-[var(--hub-fg)]">{copy.title}</span>
+        <GeistToggle on={checked} />
+      </span>
+    </button>
   )
 }
 
@@ -296,7 +244,7 @@ export function AvailabilityPulse() {
   return (
     <span
       aria-hidden="true"
-      className="size-2 shrink-0 rounded-full bg-[var(--hub-ok)]"
+      className="size-1.5 shrink-0 rounded-full bg-[var(--hub-ok)]"
     />
   )
 }

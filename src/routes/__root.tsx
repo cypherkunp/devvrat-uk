@@ -7,9 +7,7 @@ import appCss from '../styles.css?url'
 const locale = loadLocale('en')
 
 const AppDevtools = import.meta.env.DEV
-  ? lazy(() =>
-      import('#/devtools').then((m) => ({ default: m.AppDevtools })),
-    )
+  ? lazy(() => import('#/devtools').then((m) => ({ default: m.AppDevtools })))
   : null
 
 export const Route = createRootRoute({
@@ -27,7 +25,7 @@ export const Route = createRootRoute({
       },
       {
         name: 'theme-color',
-        content: '#f5f5f7',
+        content: '#ffffff',
         media: '(prefers-color-scheme: light)',
       },
       {
