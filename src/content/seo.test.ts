@@ -35,14 +35,13 @@ describe('Owner Identity markup', () => {
     expect(locale.identity.bio).toMatch(/^I am a software engineer/)
   })
 
-  it('takes sameAs from https Links and the resume, skipping mailto and Photos', () => {
+  it('takes sameAs from https Links and the resume, skipping mailto, Photos, and handbook/posts', () => {
     expect(ownerEmail()).toBe('devvrat.shukla@gmail.com')
     expect(ownerSameAsUrls()).toEqual([
       'https://x.com/devvrathq',
       'https://www.linkedin.com/in/devvratshukla',
       'https://github.com/cypherkunp',
       'https://devvrat.cc',
-      'https://www.devvrat.cc/posts/handbook',
       resumeHref,
     ])
   })
@@ -50,21 +49,40 @@ describe('Owner Identity markup', () => {
   it('builds Person and WebSite JSON-LD from Identity and Locale', () => {
     const data = linkHubJsonLd(locale)
     const graph = data['@graph'] as Array<Record<string, unknown>>
+    const page = graph.find((node) => node['@type'] === 'ProfilePage')
     const website = graph.find((node) => node['@type'] === 'WebSite')
     const person = graph.find((node) => node['@type'] === 'Person')
 
+    expect(graph.map((node) => node['@type'])).toEqual([
+      'ProfilePage',
+      'WebSite',
+      'Person',
+    ])
+    expect(page).toMatchObject({
+      '@id': `${hubOrigin}/#page`,
+      url: `${hubOrigin}/`,
+      name: locale.meta.documentTitle,
+      isPartOf: { '@id': `${hubOrigin}/#website` },
+      mainEntity: { '@id': `${hubOrigin}/#person` },
+    })
     expect(website).toMatchObject({
+      '@id': `${hubOrigin}/#website`,
       url: `${hubOrigin}/`,
       name: locale.identity.displayName,
       description: locale.meta.description,
+      inLanguage: 'en',
+      publisher: { '@id': `${hubOrigin}/#person` },
     })
     expect(person).toMatchObject({
+      '@id': `${hubOrigin}/#person`,
       name: locale.identity.displayName,
+      url: `${hubOrigin}/`,
       jobTitle: locale.identity.role,
       description: locale.identity.bio,
       email: 'devvrat.shukla@gmail.com',
       image: `${hubOrigin}/portrait.jpg`,
       sameAs: ownerSameAsUrls(),
+      mainEntityOfPage: { '@id': `${hubOrigin}/#page` },
     })
   })
 
@@ -82,6 +100,46 @@ describe('Owner Identity markup', () => {
     expect(head.meta).toContainEqual({
       property: 'og:title',
       content: locale.meta.documentTitle,
+    })
+    expect(head.meta).toContainEqual({
+      property: 'og:image',
+      content: `${hubOrigin}/og.jpg`,
+    })
+    expect(head.meta).toContainEqual({
+      property: 'og:image:alt',
+      content: locale.identity.portraitAlt,
+    })
+    expect(head.meta).toContainEqual({
+      property: 'og:image:width',
+      content: '1200',
+    })
+    expect(head.meta).toContainEqual({
+      property: 'og:image:height',
+      content: '1200',
+    })
+    expect(head.meta).toContainEqual({
+      property: 'og:site_name',
+      content: 'Devvrat',
+    })
+    expect(head.meta).toContainEqual({
+      name: 'twitter:card',
+      content: 'summary',
+    })
+    expect(head.meta).toContainEqual({
+      name: 'twitter:image',
+      content: `${hubOrigin}/og.jpg`,
+    })
+    expect(head.meta).toContainEqual({
+      name: 'twitter:image:alt',
+      content: locale.identity.portraitAlt,
+    })
+    expect(head.meta).toContainEqual({
+      property: 'profile:first_name',
+      content: 'Devvrat',
+    })
+    expect(head.meta).toContainEqual({
+      property: 'profile:username',
+      content: 'devvrathq',
     })
     expect(head.scripts[0]?.type).toBe('application/ld+json')
     expect(JSON.parse(head.scripts[0]!.children)).toEqual(linkHubJsonLd(locale))
