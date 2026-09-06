@@ -35,6 +35,30 @@ async function fetchAsBrowser(href: string) {
   return response.status
 }
 
+type LinkFailure = {
+  href: string
+  status: number
+  title: string
+  error?: string
+}
+
+function formatLinkFailures(failures: LinkFailure[]) {
+  const heading =
+    failures.length === 1
+      ? '1 outbound Link failed when opened:'
+      : `${failures.length} outbound Links failed when opened:`
+
+  const details = failures.map((failure, index) => {
+    const status = failure.status || 'no response'
+    const lines = [`${index + 1}. ${failure.href}`, `   status  ${status}`]
+    if (failure.title) lines.push(`   title   ${failure.title}`)
+    if (failure.error) lines.push(`   error   ${failure.error}`)
+    return lines.join('\n')
+  })
+
+  return [heading, '', ...details].join('\n')
+}
+
 test('Link Hub loads in the browser', async ({ page }) => {
   const response = await page.goto('/')
 
@@ -74,12 +98,7 @@ test('outbound http Links do not error when opened', async ({
 
   expect(pageHrefs).toEqual([...outboundHttpHrefs].sort())
 
-  const failures: Array<{
-    href: string
-    status: number
-    title: string
-    error?: string
-  }> = []
+  const failures: LinkFailure[] = []
 
   for (const href of pageHrefs) {
     const tab = await context.newPage()
@@ -115,5 +134,7 @@ test('outbound http Links do not error when opened', async ({
     }
   }
 
-  expect(failures, JSON.stringify(failures, null, 2)).toEqual([])
+  if (failures.length > 0) {
+    throw new Error(formatLinkFailures(failures))
+  }
 })
