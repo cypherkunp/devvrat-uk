@@ -25,6 +25,7 @@ describe('crawl files', () => {
     const sitemap = readFileSync('public/sitemap.xml', 'utf8')
 
     expect(sitemap).toContain(`<loc>${hubOrigin}/</loc>`)
+    expect(sitemap).toMatch(/<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/)
     expect(sitemap.match(/<loc>/g)).toHaveLength(1)
   })
 
