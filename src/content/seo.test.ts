@@ -27,6 +27,36 @@ describe('crawl files', () => {
     expect(sitemap).toContain(`<loc>${hubOrigin}/</loc>`)
     expect(sitemap.match(/<loc>/g)).toHaveLength(1)
   })
+
+  it('permanently redirects www to the Link Hub apex and sets HSTS includeSubDomains', () => {
+    const vercel = JSON.parse(readFileSync('vercel.json', 'utf8')) as {
+      redirects: Array<{
+        destination: string
+        permanent?: boolean
+        source?: string
+        has?: Array<{ type: string; value: string }>
+      }>
+      headers: Array<{ headers: Array<{ key: string; value: string }> }>
+    }
+
+    const wwwRedirect = vercel.redirects.find((redirect) => {
+      const toApex = redirect.destination.startsWith(`${hubOrigin}/`)
+      const fromWwwHost = redirect.has?.some(
+        (condition) =>
+          condition.type === 'host' && condition.value === 'www.devvrat.uk',
+      )
+      const fromWwwSource = redirect.source?.includes('www.devvrat.uk')
+      return toApex && (fromWwwHost || fromWwwSource)
+    })
+
+    expect(wwwRedirect?.permanent).toBe(true)
+
+    const hsts = vercel.headers
+      .flatMap((rule) => rule.headers)
+      .find((header) => header.key === 'Strict-Transport-Security')
+
+    expect(hsts?.value).toContain('includeSubDomains')
+  })
 })
 
 describe('Owner Identity markup', () => {
