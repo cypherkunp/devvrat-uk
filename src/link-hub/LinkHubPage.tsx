@@ -145,7 +145,7 @@ export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
   return (
     <MotionConfig reducedMotion="user" transition={springDefault}>
       <motion.div
-        initial={{ opacity: 0 }}
+        initial={false}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.22, ease: easeOut }}
         data-mono={monochrome ? 'true' : undefined}

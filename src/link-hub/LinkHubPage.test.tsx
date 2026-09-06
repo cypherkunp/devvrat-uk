@@ -23,6 +23,15 @@ function renderPage() {
 }
 
 describe('Link Hub page', () => {
+  it('paints the hub stage visible on first render', () => {
+    renderPage()
+
+    const stage = document.querySelector<HTMLElement>('.hub-stage')
+    expect(stage).toBeTruthy()
+    expect(stage?.style.opacity).not.toBe('0')
+    expect(stage?.getAttribute('style') ?? '').not.toMatch(/opacity:\s*0/)
+  })
+
   it('shows the Owner Identity from Locale en', () => {
     const { locale } = renderPage()
 
