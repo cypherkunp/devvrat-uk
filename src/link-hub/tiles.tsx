@@ -26,8 +26,8 @@ export function tileClass(
     .join(' ')
 }
 
-function controlLabel({ label, title }: Pick<LinkCopy, 'label' | 'title'>) {
-  return `${label}: ${title}`
+function controlLabel({ label, title, handle }: LinkCopy) {
+  return handle ? `${label}: ${title} (${handle})` : `${label}: ${title}`
 }
 
 function TileChip({ art }: { art: TileArt }) {

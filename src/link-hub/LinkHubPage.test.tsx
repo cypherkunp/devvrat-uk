@@ -22,7 +22,22 @@ function renderPage() {
   return { locale, analytics }
 }
 
+function linkName(copy: { label: string; title: string; handle?: string }) {
+  return copy.handle
+    ? `${copy.label}: ${copy.title} (${copy.handle})`
+    : `${copy.label}: ${copy.title}`
+}
+
 describe('Link Hub page', () => {
+  it('paints the hub stage visible on first render', () => {
+    renderPage()
+
+    const stage = document.querySelector<HTMLElement>('.hub-stage')
+    expect(stage).toBeTruthy()
+    expect(stage?.style.opacity).not.toBe('0')
+    expect(stage?.getAttribute('style') ?? '').not.toMatch(/opacity:\s*0/)
+  })
+
   it('shows the Owner Identity from Locale en', () => {
     const { locale } = renderPage()
 
@@ -52,7 +67,10 @@ describe('Link Hub page', () => {
     expect(screen.queryByRole('button', { name: /^share$/i })).toBeNull()
 
     const resume = screen.getByRole('link', {
-      name: `${locale.links.resume.label}: ${locale.identity.availability}`,
+      name: linkName({
+        ...locale.links.resume,
+        title: locale.identity.availability,
+      }),
     })
     expect(resume.getAttribute('href')).toBe('https://www.devvrat.cc/resume')
     expect(screen.getByText(locale.links.resume.handle!)).toBeTruthy()
@@ -62,7 +80,9 @@ describe('Link Hub page', () => {
     const { locale } = renderPage()
     const footer = screen.getByRole('contentinfo')
 
-    expect(footer.textContent).toContain(`${locale.footer.credit}. ${locale.footer.rights}`)
+    expect(footer.textContent).toContain(
+      `${locale.footer.credit}. ${locale.footer.rights}`,
+    )
     expect(footer.querySelectorAll('p')).toHaveLength(1)
     expect(footer.closest('main')).toBeNull()
   })
@@ -71,37 +91,37 @@ describe('Link Hub page', () => {
     const { locale } = renderPage()
 
     const email = screen.getByRole('link', {
-      name: `${locale.links.email.label}: ${locale.links.email.title}`,
+      name: linkName(locale.links.email),
     })
     expect(email.getAttribute('href')).toBe('mailto:devvrat.shukla@gmail.com')
     expect(screen.getByText(locale.links.email.title)).toBeTruthy()
     expect(screen.getByText(locale.links.email.handle!)).toBeTruthy()
 
     const twitter = screen.getByRole('link', {
-      name: `${locale.links.twitter.label}: ${locale.links.twitter.title}`,
+      name: linkName(locale.links.twitter),
     })
     expect(twitter.getAttribute('href')).toBe('https://x.com/devvrathq')
 
     const linkedin = screen.getByRole('link', {
-      name: `${locale.links.linkedin.label}: ${locale.links.linkedin.title}`,
+      name: linkName(locale.links.linkedin),
     })
     expect(linkedin.getAttribute('href')).toBe(
       'https://www.linkedin.com/in/devvratshukla',
     )
 
     const github = screen.getByRole('link', {
-      name: `${locale.links.github.label}: ${locale.links.github.title}`,
+      name: linkName(locale.links.github),
     })
     expect(github.getAttribute('href')).toBe('https://github.com/cypherkunp')
 
     const central = screen.getByRole('link', {
-      name: `${locale.links['central-hub'].label}: ${locale.links['central-hub'].title}`,
+      name: linkName(locale.links['central-hub']),
     })
     expect(central.getAttribute('href')).toBe('https://devvrat.cc')
     expect(central.getAttribute('data-highlighted')).toBe('true')
 
     const handbook = screen.getByRole('link', {
-      name: `${locale.links.handbook.label}: ${locale.links.handbook.title}`,
+      name: linkName(locale.links.handbook),
     })
     expect(handbook.getAttribute('href')).toBe(
       'https://www.devvrat.cc/posts/handbook',
@@ -177,9 +197,7 @@ describe('Link Hub page', () => {
     const { locale, analytics } = renderPage()
     const email = locale.links.email
 
-    fireEvent.click(
-      screen.getByRole('link', { name: `${email.label}: ${email.title}` }),
-    )
+    fireEvent.click(screen.getByRole('link', { name: linkName(email) }))
 
     expect(analytics.events).toContainEqual({
       type: 'link_click',
@@ -192,7 +210,10 @@ describe('Link Hub page', () => {
 
     fireEvent.click(
       screen.getByRole('link', {
-        name: `${locale.links.resume.label}: ${locale.identity.availability}`,
+        name: linkName({
+          ...locale.links.resume,
+          title: locale.identity.availability,
+        }),
       }),
     )
 
