@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 
-import { hubOrigin, resumeHref } from '#/content/hub-config'
+import { apexLocation, hubOrigin, resumeHref } from '#/content/hub-config'
 import { loadLocale } from '#/content/locale'
 import {
   linkHubHead,
@@ -52,11 +52,32 @@ describe('crawl files', () => {
 
     expect(wwwRedirect?.permanent).toBe(true)
 
+    const homepageRedirect = vercel.redirects.find((redirect) => {
+      const fromWwwHost = redirect.has?.some(
+        (condition) =>
+          condition.type === 'host' && condition.value === 'www.devvrat.uk',
+      )
+      return fromWwwHost && redirect.source === '/'
+    })
+
+    expect(homepageRedirect?.destination).toBe(`${hubOrigin}/`)
+    expect(homepageRedirect?.permanent).toBe(true)
+
     const hsts = vercel.headers
       .flatMap((rule) => rule.headers)
       .find((header) => header.key === 'Strict-Transport-Security')
 
     expect(hsts?.value).toContain('includeSubDomains')
+  })
+})
+
+describe('www apex redirect', () => {
+  it('maps the www homepage and paths onto the Link Hub origin', () => {
+    expect(apexLocation('https://www.devvrat.uk/')).toBe(`${hubOrigin}/`)
+    expect(apexLocation('https://www.devvrat.uk/foo?x=1')).toBe(
+      `${hubOrigin}/foo?x=1`,
+    )
+    expect(apexLocation(`${hubOrigin}/`)).toBeNull()
   })
 })
 

@@ -24,6 +24,19 @@ export type ActionId = 'copy-url' | 'mono' | 'dark'
 
 export const hubOrigin = 'https://devvrat.uk'
 
+/** 308 target when the request host is `www.<apex>`. Vercel's `/:path*` misses `/`. */
+export function apexLocation(
+  requestUrl: string,
+  apex = hubOrigin,
+): string | null {
+  const url = new URL(requestUrl)
+  const apexHost = new URL(apex).hostname
+  if (url.hostname !== `www.${apexHost}`) return null
+  url.hostname = apexHost
+  url.protocol = 'https:'
+  return url.href
+}
+
 export const resumeHref = 'https://www.devvrat.cc/resume'
 
 export const copyUrlActionId = 'copy-url' as const satisfies ActionId

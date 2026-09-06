@@ -1,6 +1,12 @@
 {
   "redirects": [
     {
+      "source": "/",
+      "has": [{ "type": "host", "value": "www.devvrat.uk" }],
+      "destination": "https://devvrat.uk/",
+      "permanent": true
+    },
+    {
       "source": "/:path*",
       "has": [{ "type": "host", "value": "www.devvrat.uk" }],
       "destination": "https://devvrat.uk/:path*",
