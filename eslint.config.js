@@ -22,6 +22,8 @@ export default [
       '.nitro/**',
       '.tanstack/**',
       'dist/**',
+      'test-results/**',
+      'playwright-report/**',
     ],
   },
 ]
