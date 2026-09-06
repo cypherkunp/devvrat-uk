@@ -12,8 +12,7 @@ function LinkHubRoute() {
   const locale = loadLocale('en')
   const analytics = useMemo(() => createAnalyticsFromEnv(), [])
 
-  const hubUrl =
-    typeof window !== 'undefined' ? window.location.origin : hubOrigin
+  const hubUrl = hubOrigin
 
   return <LinkHubPage locale={locale} analytics={analytics} hubUrl={hubUrl} />
 }
