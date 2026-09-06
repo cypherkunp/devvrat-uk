@@ -30,6 +30,11 @@ describe('crawl files', () => {
 })
 
 describe('Owner Identity markup', () => {
+  it('keeps documentTitle free of Linktree and a grammatical Identity bio', () => {
+    expect(locale.meta.documentTitle).not.toContain('Linktree')
+    expect(locale.identity.bio).toMatch(/^I am a software engineer/)
+  })
+
   it('takes sameAs from https Links and the resume, skipping mailto and Photos', () => {
     expect(ownerEmail()).toBe('devvrat.shukla@gmail.com')
     expect(ownerSameAsUrls()).toEqual([
