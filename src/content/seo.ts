@@ -12,7 +12,9 @@ function isConfigured(link: HubLink): link is ConfiguredLink {
 }
 
 function isIdentityProfileUrl(href: string) {
-  return href.startsWith('https://') && !new URL(href).pathname.includes('/posts/')
+  return (
+    href.startsWith('https://') && !new URL(href).pathname.includes('/posts/')
+  )
 }
 
 export function ownerEmail(links: HubLink[] = hubLinks): string | undefined {

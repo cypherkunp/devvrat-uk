@@ -80,7 +80,9 @@ describe('Link Hub page', () => {
     const { locale } = renderPage()
     const footer = screen.getByRole('contentinfo')
 
-    expect(footer.textContent).toContain(`${locale.footer.credit}. ${locale.footer.rights}`)
+    expect(footer.textContent).toContain(
+      `${locale.footer.credit}. ${locale.footer.rights}`,
+    )
     expect(footer.querySelectorAll('p')).toHaveLength(1)
     expect(footer.closest('main')).toBeNull()
   })
@@ -195,9 +197,7 @@ describe('Link Hub page', () => {
     const { locale, analytics } = renderPage()
     const email = locale.links.email
 
-    fireEvent.click(
-      screen.getByRole('link', { name: linkName(email) }),
-    )
+    fireEvent.click(screen.getByRole('link', { name: linkName(email) }))
 
     expect(analytics.events).toContainEqual({
       type: 'link_click',
