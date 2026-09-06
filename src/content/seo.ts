@@ -11,6 +11,10 @@ function isConfigured(link: HubLink): link is ConfiguredLink {
   return 'href' in link
 }
 
+function isIdentityProfileUrl(href: string) {
+  return href.startsWith('https://') && !new URL(href).pathname.includes('/posts/')
+}
+
 export function ownerEmail(links: HubLink[] = hubLinks): string | undefined {
   const mailto = links
     .filter(isConfigured)
@@ -25,7 +29,7 @@ export function ownerSameAsUrls(
   const urls = links
     .filter(isConfigured)
     .map((link) => link.href)
-    .filter((href) => href.startsWith('https://'))
+    .filter(isIdentityProfileUrl)
 
   if (!urls.includes(resume)) urls.push(resume)
   return urls
@@ -42,12 +46,21 @@ export function linkHubJsonLd(
     '@context': 'https://schema.org',
     '@graph': [
       {
+        '@type': 'ProfilePage',
+        '@id': `${origin}/#page`,
+        url,
+        name: locale.meta.documentTitle,
+        isPartOf: { '@id': `${origin}/#website` },
+        mainEntity: { '@id': `${origin}/#person` },
+      },
+      {
         '@type': 'WebSite',
         '@id': `${origin}/#website`,
         url,
         name: locale.identity.displayName,
         description: locale.meta.description,
         inLanguage: 'en',
+        publisher: { '@id': `${origin}/#person` },
       },
       {
         '@type': 'Person',
@@ -59,6 +72,7 @@ export function linkHubJsonLd(
         ...(email ? { email } : {}),
         image: `${origin}/portrait.jpg`,
         sameAs: ownerSameAsUrls(),
+        mainEntityOfPage: { '@id': `${origin}/#page` },
       },
     ],
   }
@@ -66,7 +80,7 @@ export function linkHubJsonLd(
 
 export function linkHubHead(locale: Locale, origin = hubOrigin) {
   const url = `${origin}/`
-  const image = `${origin}/portrait.jpg`
+  const shareImage = `${origin}/og.jpg`
   const { documentTitle, description } = locale.meta
 
   return {
@@ -76,13 +90,19 @@ export function linkHubHead(locale: Locale, origin = hubOrigin) {
       { property: 'og:url', content: url },
       { property: 'og:title', content: documentTitle },
       { property: 'og:description', content: description },
-      { property: 'og:image', content: image },
+      { property: 'og:image', content: shareImage },
       { property: 'og:image:alt', content: locale.identity.portraitAlt },
+      { property: 'og:image:width', content: '1200' },
+      { property: 'og:image:height', content: '1200' },
+      { property: 'og:site_name', content: 'Devvrat' },
       { property: 'og:locale', content: 'en_GB' },
+      { property: 'profile:first_name', content: 'Devvrat' },
+      { property: 'profile:username', content: 'devvrathq' },
       { name: 'twitter:card', content: 'summary' },
       { name: 'twitter:title', content: documentTitle },
       { name: 'twitter:description', content: description },
-      { name: 'twitter:image', content: image },
+      { name: 'twitter:image', content: shareImage },
+      { name: 'twitter:image:alt', content: locale.identity.portraitAlt },
     ],
     links: [{ rel: 'canonical', href: url }],
     scripts: [
