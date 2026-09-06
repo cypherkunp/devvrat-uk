@@ -40,6 +40,12 @@ function renderPage() {
   return { locale, analytics }
 }
 
+function linkName(copy: { label: string; title: string; handle?: string }) {
+  return copy.handle
+    ? `${copy.label}: ${copy.title} (${copy.handle})`
+    : `${copy.label}: ${copy.title}`
+}
+
 describe('Link Hub page with reduced motion', () => {
   it('still shows Identity and every Link', () => {
     const { locale } = renderPage()
@@ -65,7 +71,7 @@ describe('Link Hub page with reduced motion', () => {
 
     fireEvent.click(
       screen.getByRole('link', {
-        name: `${locale.links.email.label}: ${locale.links.email.title}`,
+        name: linkName(locale.links.email),
       }),
     )
     fireEvent.click(
