@@ -36,13 +36,13 @@ export function NotFoundPage({
       <GridPage>
         <GridSystem guideWidth={1} unstable_useContainer>
           <Grid
-            className="hub-grid"
+            className="hub-grid not-found-grid"
             columns={{ sm: 1, md: 2, lg: 4 }}
-            rows={{ sm: 3, md: 8, lg: 4 }}
+            rows={{ sm: 2, md: 8, lg: 4 }}
           >
             <GridCrosses />
 
-            <main className="contents">
+            <main className="not-found-main md:contents">
               <GridCell>
                 <div className={tileClass(true, 'center')}>
                   <h1 className="display-title min-w-0 text-7xl leading-none text-[var(--hub-fg)] md:text-8xl lg:text-9xl">

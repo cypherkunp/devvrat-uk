@@ -26,6 +26,10 @@ describe('Not Found page', () => {
     expect(
       screen.getByText('Redirecting you to the homepage in 10'),
     ).toBeTruthy()
+
+    const footer = screen.getByRole('contentinfo')
+    expect(footer.closest('main')).toBeNull()
+    expect(document.querySelector('.not-found-grid')).toBeTruthy()
   })
 
   it('ticks the countdown every second then sends the visitor home', () => {
