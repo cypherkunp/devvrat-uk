@@ -1,8 +1,8 @@
 # Clean code
 
-How to write and place code in this repo. Read this before adding, moving, or splitting modules, components, or routes.
+How to write and place code in this repo. Read this before adding, moving, splitting, or naming modules, components, or routes.
 
-Done when every new or moved unit has one reason to change, lives in the folder that matches that reason, and the route file only composes.
+Done when every new or moved unit has one reason to change, lives in the folder that matches that reason, is named kebab-case, and the route file only composes.
 
 ## Layout
 
@@ -24,7 +24,11 @@ A route file loads Locale, analytics, and origin, then mounts one page component
 
 Split a file when it already changes for more than one reason (page chrome vs tile vs hook vs type guard). Keep a unit with its neighbours: `AsciiPortrait` next to the page that shows it, `isConfiguredLink` next to `HubLink`, `useOsDark` in `hooks.ts` next to the page that reads scheme.
 
-Name the file after the unit (`ascii-portrait.tsx`, `hub-footer.tsx`, `hooks.ts`). Re-export only when a caller outside the folder needs a barrel; same-folder imports go to the file.
+Re-export only when a caller outside the folder needs a barrel; same-folder imports go to the file.
+
+## Names
+
+Name files kebab-case after the unit (`link-hub-page.tsx`, `ascii-portrait.tsx`, `hub-footer.tsx`, `hooks.ts`). Tests keep the same stem (`link-hub-page.test.tsx`, `link-hub-page.reduced-motion.test.tsx`). The export stays PascalCase (`LinkHubPage` in `link-hub-page.tsx`).
 
 ## Extract
 

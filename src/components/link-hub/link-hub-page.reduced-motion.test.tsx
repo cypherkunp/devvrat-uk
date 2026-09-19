@@ -3,7 +3,7 @@ import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 
 import { createFakeAnalytics } from '#/analytics/port'
 import { loadLocale } from '#/content/locale'
-import { LinkHubPage } from '#/components/link-hub/LinkHubPage'
+import { LinkHubPage } from '#/components/link-hub/link-hub-page'
 
 /* Motion reads prefers-reduced-motion once per environment, so this seam lives in
    its own file where the query answers "reduce" before anything renders. */

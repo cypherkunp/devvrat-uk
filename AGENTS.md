@@ -14,7 +14,7 @@ Single-context: root `CONTEXT.md` + `docs/adr/`. See `docs/agents/domain.md`.
 
 ### Clean code
 
-When writing, moving, or splitting modules, components, or routes. See `docs/agents/clean-code.md`.
+When writing, moving, splitting, or naming modules, components, or routes. See `docs/agents/clean-code.md`.
 
 ### Conventional commits
 

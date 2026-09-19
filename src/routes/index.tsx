@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 
 import { createAnalyticsFromEnv } from '#/analytics/create'
-import { LinkHubPage } from '#/components/link-hub/LinkHubPage'
+import { LinkHubPage } from '#/components/link-hub/link-hub-page'
 import { hubOrigin } from '#/content/hub-config'
 import { loadLocale } from '#/content/locale'
 
