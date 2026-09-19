@@ -68,6 +68,11 @@
     "credit": "Hand prompted by Devvrat",
     "rights": "All Rights Are Left"
   },
+  "notFound": {
+    "code": "404",
+    "heading": "Looks like you have wandered off the map",
+    "redirect": "Redirecting you to the homepage in {seconds}"
+  },
   "meta": {
     "documentTitle": "Devvrat | Connect",
     "description": "Devvrat — AI sorcerer, engineer, craftsman. Software engineer specializing in web apps, digital experiences, and high-performance teams."

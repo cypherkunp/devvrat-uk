@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react'
 import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
 
+import { NotFoundRoute } from '#/components/not-found/not-found-page'
 import { loadLocale } from '#/content/locale'
 import { linkHubHead } from '#/content/seo'
 import appCss from '../styles.css?url'
@@ -69,6 +70,7 @@ export const Route = createRootRoute({
     scripts: seo.scripts,
   }),
   shellComponent: RootDocument,
+  notFoundComponent: NotFoundRoute,
 })
 
 function RootDocument({ children }: { children: React.ReactNode }) {

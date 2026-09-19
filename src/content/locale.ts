@@ -46,6 +46,11 @@ export type Locale = {
     credit: string
     rights: string
   }
+  notFound: {
+    code: string
+    heading: string
+    redirect: string
+  }
   meta: {
     documentTitle: string
     description: string

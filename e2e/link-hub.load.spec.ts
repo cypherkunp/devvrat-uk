@@ -71,3 +71,32 @@ for (const href of outboundHttpHrefs) {
     expect(title, issue).not.toMatch(/not found|\b404\b/i)
   })
 }
+
+test('unknown path shows 404 then redirects to the Link Hub', async ({
+  page,
+}) => {
+  await page.clock.install()
+  const response = await page.goto('/no-such-place')
+
+  expect(response, 'unknown path should respond').toBeTruthy()
+  await expect(
+    page.getByRole('heading', { level: 1, name: '404' }),
+  ).toBeVisible()
+  await expect(
+    page.getByText('Looks like you have wandered off the map'),
+  ).toBeVisible()
+  await expect(
+    page.getByText('Redirecting you to the homepage in 10'),
+  ).toBeVisible()
+
+  await page.clock.runFor(1000)
+  await expect(
+    page.getByText('Redirecting you to the homepage in 9'),
+  ).toBeVisible()
+
+  await page.clock.runFor(9000)
+  await expect(page).toHaveURL('/')
+  await expect(
+    page.getByRole('heading', { level: 1, name: 'Devvrat' }),
+  ).toBeVisible()
+})
