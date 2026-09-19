@@ -30,16 +30,17 @@ function controlLabel({ label, title, handle }: LinkCopy) {
   return handle ? `${label}: ${title} (${handle})` : `${label}: ${title}`
 }
 
-function TileChip({ art }: { art: TileArt }) {
+function TileChip({ art, filled = false }: { art: TileArt; filled?: boolean }) {
   return (
     <span
       aria-hidden="true"
       className="flex size-8 shrink-0 items-center justify-center rounded-[6px] p-2"
       style={{
-        color: art.accent,
-        backgroundColor:
-          art.chip ??
-          `color-mix(in srgb, ${art.accent} 22%, var(--ds-gray-200))`,
+        color: filled ? '#fff' : art.accent,
+        backgroundColor: filled
+          ? art.accent
+          : (art.chip ??
+            `color-mix(in srgb, ${art.accent} 22%, var(--ds-gray-200))`),
       }}
     >
       {art.glyph}
@@ -191,7 +192,7 @@ export function LinkTile({
       onClick={onActivate}
     >
       <span className="flex items-center gap-3">
-        <TileChip art={art} />
+        <TileChip art={art} filled={link.highlighted} />
         <TileLabel label={copy.label} />
         <TileArrow />
       </span>

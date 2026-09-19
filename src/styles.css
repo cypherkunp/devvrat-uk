@@ -470,6 +470,21 @@ body {
     color 160ms ease;
 }
 
+.tile[data-highlighted='true'] {
+  background-color: color-mix(
+    in srgb,
+    var(--ds-blue-700) 28%,
+    var(--ds-background-100)
+  );
+}
+
+.tile[data-highlighted='true'] .tile-arrow,
+.tile[data-highlighted='true'] .text-label-13,
+.tile[data-highlighted='true'] .text-label-13-mono,
+.tile[data-highlighted='true'] .text-label-14 {
+  color: var(--hub-fg);
+}
+
 @media (hover: hover) and (pointer: fine) {
   .tile:hover {
     background-color: var(--ds-gray-100);
@@ -486,6 +501,18 @@ body {
   .tile:hover .tile-arrow {
     transform: translateX(2px);
     color: var(--ds-gray-1000);
+  }
+
+  .tile[data-highlighted='true']:hover {
+    background-color: color-mix(
+      in srgb,
+      var(--ds-blue-700) 36%,
+      var(--ds-background-100)
+    );
+  }
+
+  .tile[data-highlighted='true']:hover .tile-arrow {
+    color: var(--hub-fg);
   }
 }
 
