@@ -41,4 +41,4 @@ Subject is imperative and lowercase (`extract`, not `Extract` / `extracted`). He
 
 ## Push
 
-`pre-push` lints every commit in the range being sent to origin, then runs `pnpm test && pnpm test:e2e`. Commits already on the remote are not re-checked. Unpushed commits from before this hook still have to pass — rewrite their subjects, or push that stack once with `--no-verify`.
+`pre-push` lints every commit in the range being sent to origin, then runs `pnpm test && pnpm test:e2e`. Commits already on the remote are not re-checked. The range lint skips `body-max-line-length`, `subject-empty`, `subject-full-stop`, and `type-empty` so older / merge-style messages can still push; `commit-msg` still enforces the full rules on new commits.
