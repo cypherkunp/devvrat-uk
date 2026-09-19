@@ -1,0 +1,14 @@
+---
+description: Conventional Commits format for every git commit message
+alwaysApply: true
+---
+
+# Conventional commits
+
+Every git commit message in this repo uses [Conventional Commits](https://www.conventionalcommits.org/). See `docs/agents/conventional-commits.md`.
+
+```
+type(scope): description
+```
+
+Examples: `feat(link-hub): extract ascii portrait`, `docs: add clean-code agent guide`, `chore: add commitlint on pre-push`.

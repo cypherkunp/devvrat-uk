@@ -1,1 +1,22 @@
+# Lint the commits git is about to send, then the existing test gate.
+zero=0000000000000000000000000000000000000000
+
+while read -r _local_ref local_sha _remote_ref remote_sha; do
+  if [ -z "$local_sha" ] || [ "$local_sha" = "$zero" ]; then
+    continue
+  fi
+
+  if [ "$remote_sha" = "$zero" ]; then
+    if git rev-parse --verify origin/main >/dev/null 2>&1; then
+      from=$(git merge-base "$local_sha" origin/main)
+    else
+      from=$(git rev-list --max-parents=0 "$local_sha")
+    fi
+  else
+    from=$remote_sha
+  fi
+
+  pnpm exec commitlint --from "$from" --to "$local_sha"
+done
+
 pnpm test && pnpm test:e2e
