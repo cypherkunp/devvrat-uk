@@ -25,6 +25,9 @@ function mark(Icon: Icon) {
   return <Icon aria-hidden className="size-full" size="100%" weight="bold" />
 }
 
+/** Mid gray so near-black/white glyphs don't wash the chip in dark mode. */
+const grayChip = 'color-mix(in srgb, #6e6e73 22%, var(--ds-gray-200))'
+
 export const tileArt: Record<LinkId | ActionId, TileArt> = {
   resume: {
     accent: '#34c759',
@@ -32,7 +35,7 @@ export const tileArt: Record<LinkId | ActionId, TileArt> = {
   },
   twitter: {
     accent: 'var(--ds-gray-1000)',
-    chip: 'var(--ds-gray-600)',
+    chip: grayChip,
     glyph: mark(XLogoIcon),
   },
   linkedin: {
@@ -41,7 +44,7 @@ export const tileArt: Record<LinkId | ActionId, TileArt> = {
   },
   github: {
     accent: 'var(--ds-gray-1000)',
-    chip: 'var(--ds-gray-600)',
+    chip: grayChip,
     glyph: mark(GithubLogoIcon),
   },
   'central-hub': {
