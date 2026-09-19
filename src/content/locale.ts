@@ -8,10 +8,6 @@ export type LinkCopy = {
   handle?: string
 }
 
-export type PhotosCopy = LinkCopy & {
-  comingSoon: string
-}
-
 export type ActionCopy = {
   label: string
   title: string
@@ -28,13 +24,12 @@ export type Locale = {
     portraitAlt: string
   }
   links: {
-    email: LinkCopy
     twitter: LinkCopy
     linkedin: LinkCopy
     github: LinkCopy
     'central-hub': LinkCopy
     handbook: LinkCopy
-    photos: PhotosCopy
+    photos: LinkCopy
     resume: LinkCopy
   }
   actions: {

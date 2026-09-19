@@ -3,12 +3,7 @@ import { describe, expect, it } from 'vitest'
 
 import { apexLocation, hubOrigin, resumeHref } from '#/content/hub-config'
 import { loadLocale } from '#/content/locale'
-import {
-  linkHubHead,
-  linkHubJsonLd,
-  ownerEmail,
-  ownerSameAsUrls,
-} from '#/content/seo'
+import { linkHubHead, linkHubJsonLd, ownerSameAsUrls } from '#/content/seo'
 
 const locale = loadLocale('en')
 
@@ -87,13 +82,12 @@ describe('Owner Identity markup', () => {
     expect(locale.identity.bio).toMatch(/^I am a software engineer/)
   })
 
-  it('takes sameAs from https Links and the resume, skipping mailto, Photos, and handbook/posts', () => {
-    expect(ownerEmail()).toBe('devvrat.shukla@gmail.com')
+  it('takes sameAs from https Links and the resume, skipping Photos and handbook/posts', () => {
     expect(ownerSameAsUrls()).toEqual([
-      'https://x.com/devvrathq',
+      'https://devvrat.cc',
       'https://www.linkedin.com/in/devvratshukla',
       'https://github.com/cypherkunp',
-      'https://devvrat.cc',
+      'https://x.com/devvrathq',
       resumeHref,
     ])
   })
@@ -131,11 +125,11 @@ describe('Owner Identity markup', () => {
       url: `${hubOrigin}/`,
       jobTitle: locale.identity.role,
       description: locale.identity.bio,
-      email: 'devvrat.shukla@gmail.com',
       image: `${hubOrigin}/portrait.jpg`,
       sameAs: ownerSameAsUrls(),
       mainEntityOfPage: { '@id': `${hubOrigin}/#page` },
     })
+    expect(person).not.toHaveProperty('email')
   })
 
   it('exposes description, canonical, and share tags for the homepage', () => {

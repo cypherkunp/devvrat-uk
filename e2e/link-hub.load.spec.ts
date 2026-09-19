@@ -5,7 +5,7 @@ import { hubLinks, resumeHref } from '../src/content/hub-config'
 const outboundHttpHrefs = [
   resumeHref,
   ...hubLinks.flatMap((link) =>
-    'href' in link && link.href.startsWith('http') ? [link.href] : [],
+    link.href.startsWith('http') ? [link.href] : [],
   ),
 ]
 

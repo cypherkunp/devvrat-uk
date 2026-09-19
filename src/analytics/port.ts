@@ -2,7 +2,7 @@ import type { ActionId, LinkId } from '#/content/hub-config'
 
 export type AnalyticsEvent =
   | { type: 'visit' }
-  | { type: 'link_click'; linkId: Exclude<LinkId, 'photos'> }
+  | { type: 'link_click'; linkId: LinkId }
   | { type: 'action_click'; actionId: ActionId }
 
 export type AnalyticsPort = {

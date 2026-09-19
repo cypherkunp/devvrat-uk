@@ -8,11 +8,6 @@
     "portraitAlt": "Portrait of Devvrat"
   },
   "links": {
-    "email": {
-      "label": "Email",
-      "title": "Write me",
-      "handle": "devvrat.shukla@gmail.com"
-    },
     "twitter": {
       "label": "Twitter",
       "title": "Signal",
@@ -29,7 +24,7 @@
       "handle": "cypherkunp"
     },
     "central-hub": {
-      "label": "Central Hub",
+      "label": "Portfolio Site",
       "title": "Primary site",
       "handle": "devvrat.cc"
     },
@@ -41,7 +36,7 @@
     "photos": {
       "label": "Photos",
       "title": "Gallery",
-      "comingSoon": "Coming soon"
+      "handle": "devvrat.cc/photos"
     },
     "resume": {
       "label": "Availability",

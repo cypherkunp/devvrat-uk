@@ -1,5 +1,4 @@
 export type LinkId =
-  | 'email'
   | 'twitter'
   | 'linkedin'
   | 'github'
@@ -9,20 +8,12 @@ export type LinkId =
   | 'resume'
 
 export type ConfiguredLink = {
-  id: Exclude<LinkId, 'photos'>
+  id: LinkId
   href: string
   highlighted?: boolean
 }
 
-export type PlaceholderLink = {
-  id: 'photos'
-}
-
-export type HubLink = ConfiguredLink | PlaceholderLink
-
-export function isConfiguredLink(link: HubLink): link is ConfiguredLink {
-  return 'href' in link
-}
+export type HubLink = ConfiguredLink
 
 export type ActionId = 'copy-url' | 'mono' | 'dark'
 
@@ -48,11 +39,10 @@ export const monoActionId = 'mono' as const satisfies ActionId
 export const darkActionId = 'dark' as const satisfies ActionId
 
 export const hubLinks: HubLink[] = [
-  { id: 'email', href: 'mailto:devvrat.shukla@gmail.com' },
-  { id: 'twitter', href: 'https://x.com/devvrathq' },
+  { id: 'central-hub', href: 'https://devvrat.cc', highlighted: true },
   { id: 'linkedin', href: 'https://www.linkedin.com/in/devvratshukla' },
   { id: 'github', href: 'https://github.com/cypherkunp' },
-  { id: 'central-hub', href: 'https://devvrat.cc', highlighted: true },
+  { id: 'twitter', href: 'https://x.com/devvrathq' },
   { id: 'handbook', href: 'https://www.devvrat.cc/posts/handbook' },
-  { id: 'photos' },
+  { id: 'photos', href: 'https://www.devvrat.cc/photos' },
 ]

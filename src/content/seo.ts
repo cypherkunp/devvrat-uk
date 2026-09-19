@@ -1,33 +1,18 @@
-import {
-  hubLinks,
-  hubOrigin,
-  isConfiguredLink,
-  resumeHref,
-} from '#/content/hub-config'
+import { hubLinks, hubOrigin, resumeHref } from '#/content/hub-config'
 import type { HubLink } from '#/content/hub-config'
 import type { Locale } from '#/content/locale'
 
 function isIdentityProfileUrl(href: string) {
-  return (
-    href.startsWith('https://') && !new URL(href).pathname.includes('/posts/')
-  )
-}
-
-export function ownerEmail(links: HubLink[] = hubLinks): string | undefined {
-  const mailto = links
-    .filter(isConfiguredLink)
-    .find((link) => link.href.startsWith('mailto:'))
-  return mailto?.href.slice('mailto:'.length)
+  if (!href.startsWith('https://')) return false
+  const path = new URL(href).pathname
+  return !path.includes('/posts/') && path !== '/photos'
 }
 
 export function ownerSameAsUrls(
   links: HubLink[] = hubLinks,
   resume = resumeHref,
 ): string[] {
-  const urls = links
-    .filter(isConfiguredLink)
-    .map((link) => link.href)
-    .filter(isIdentityProfileUrl)
+  const urls = links.map((link) => link.href).filter(isIdentityProfileUrl)
 
   if (!urls.includes(resume)) urls.push(resume)
   return urls
@@ -38,7 +23,6 @@ export function linkHubJsonLd(
   origin = hubOrigin,
 ): Record<string, unknown> {
   const url = `${origin}/`
-  const email = ownerEmail()
 
   return {
     '@context': 'https://schema.org',
@@ -67,7 +51,6 @@ export function linkHubJsonLd(
         url,
         jobTitle: locale.identity.role,
         description: locale.identity.bio,
-        ...(email ? { email } : {}),
         image: `${origin}/portrait.jpg`,
         sameAs: ownerSameAsUrls(),
         mainEntityOfPage: { '@id': `${origin}/#page` },

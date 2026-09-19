@@ -87,61 +87,63 @@ describe('Link Hub page', () => {
     expect(footer.closest('main')).toBeNull()
   })
 
-  it('routes configured Links to their destinations and highlights Central Hub', () => {
+  it('routes configured Links in hire-first order and highlights Portfolio Site', () => {
     const { locale } = renderPage()
 
-    const email = screen.getByRole('link', {
-      name: linkName(locale.links.email),
-    })
-    expect(email.getAttribute('href')).toBe('mailto:devvrat.shukla@gmail.com')
-    expect(screen.getByText(locale.links.email.title)).toBeTruthy()
-    expect(screen.getByText(locale.links.email.handle!)).toBeTruthy()
+    expect(document.querySelector('a[href^="mailto:"]')).toBeNull()
+    expect(screen.queryByText('Email')).toBeNull()
+    expect(screen.queryByText('Central Hub')).toBeNull()
+    expect(locale.links['central-hub'].label).toBe('Portfolio Site')
 
-    const twitter = screen.getByRole('link', {
-      name: linkName(locale.links.twitter),
+    const resume = screen.getByRole('link', {
+      name: linkName({
+        ...locale.links.resume,
+        title: locale.identity.availability,
+      }),
     })
-    expect(twitter.getAttribute('href')).toBe('https://x.com/devvrathq')
-
+    const portfolio = screen.getByRole('link', {
+      name: linkName(locale.links['central-hub']),
+    })
     const linkedin = screen.getByRole('link', {
       name: linkName(locale.links.linkedin),
     })
-    expect(linkedin.getAttribute('href')).toBe(
-      'https://www.linkedin.com/in/devvratshukla',
-    )
-
     const github = screen.getByRole('link', {
       name: linkName(locale.links.github),
     })
-    expect(github.getAttribute('href')).toBe('https://github.com/cypherkunp')
-
-    const central = screen.getByRole('link', {
-      name: linkName(locale.links['central-hub']),
+    const twitter = screen.getByRole('link', {
+      name: linkName(locale.links.twitter),
     })
-    expect(central.getAttribute('href')).toBe('https://devvrat.cc')
-    expect(central.getAttribute('data-highlighted')).toBe('true')
-
     const handbook = screen.getByRole('link', {
       name: linkName(locale.links.handbook),
     })
+    const photos = screen.getByRole('link', {
+      name: linkName(locale.links.photos),
+    })
+
+    expect(resume.getAttribute('href')).toBe('https://www.devvrat.cc/resume')
+    expect(portfolio.getAttribute('href')).toBe('https://devvrat.cc')
+    expect(portfolio.getAttribute('data-highlighted')).toBe('true')
+    expect(linkedin.getAttribute('href')).toBe(
+      'https://www.linkedin.com/in/devvratshukla',
+    )
+    expect(github.getAttribute('href')).toBe('https://github.com/cypherkunp')
+    expect(twitter.getAttribute('href')).toBe('https://x.com/devvrathq')
     expect(handbook.getAttribute('href')).toBe(
       'https://www.devvrat.cc/posts/handbook',
     )
-  })
+    expect(photos.getAttribute('href')).toBe('https://www.devvrat.cc/photos')
 
-  it('shows Photos coming soon in-page and does not navigate away', async () => {
-    const { locale } = renderPage()
-    const photos = locale.links.photos
-    const control = screen.getByRole('button', {
-      name: `${photos.label}: ${photos.title}`,
-    })
-
-    expect(control.closest('a')).toBeNull()
-    expect(screen.queryByText(photos.comingSoon)).toBeNull()
-
-    fireEvent.click(control)
-
-    expect(screen.getByText(photos.comingSoon)).toBeTruthy()
-    expect(window.location.href).not.toMatch(/photos/i)
+    expect(
+      screen.getAllByRole('link').map((link) => link.getAttribute('href')),
+    ).toEqual([
+      resume.getAttribute('href'),
+      portfolio.getAttribute('href'),
+      linkedin.getAttribute('href'),
+      github.getAttribute('href'),
+      twitter.getAttribute('href'),
+      handbook.getAttribute('href'),
+      photos.getAttribute('href'),
+    ])
   })
 
   it('copies the Link Hub URL and shows success feedback', async () => {
@@ -195,13 +197,13 @@ describe('Link Hub page', () => {
 
   it('records link_click with the Link id when a configured Link is activated', () => {
     const { locale, analytics } = renderPage()
-    const email = locale.links.email
+    const github = locale.links.github
 
-    fireEvent.click(screen.getByRole('link', { name: linkName(email) }))
+    fireEvent.click(screen.getByRole('link', { name: linkName(github) }))
 
     expect(analytics.events).toContainEqual({
       type: 'link_click',
-      linkId: 'email',
+      linkId: 'github',
     })
   })
 
@@ -350,18 +352,15 @@ describe('Link Hub page', () => {
     expect(stage?.getAttribute('data-mono')).toBe('true')
   })
 
-  it('does not record link_click for Photos placeholder', () => {
+  it('records link_click with the Link id when Photos is activated', () => {
     const { locale, analytics } = renderPage()
     const photos = locale.links.photos
 
-    fireEvent.click(
-      screen.getByRole('button', {
-        name: `${photos.label}: ${photos.title}`,
-      }),
-    )
+    fireEvent.click(screen.getByRole('link', { name: linkName(photos) }))
 
-    expect(analytics.events.some((event) => event.type === 'link_click')).toBe(
-      false,
-    )
+    expect(analytics.events).toContainEqual({
+      type: 'link_click',
+      linkId: 'photos',
+    })
   })
 })

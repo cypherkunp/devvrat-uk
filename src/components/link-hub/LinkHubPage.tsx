@@ -6,7 +6,6 @@ import {
   copyUrlActionId,
   darkActionId,
   hubLinks,
-  isConfiguredLink,
   monoActionId,
   resumeHref,
 } from '#/content/hub-config'
@@ -38,7 +37,6 @@ export type LinkHubPageProps = {
 
 export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
   const { identity } = locale
-  const [photosMessage, showPhotosMessage] = useTransientMessage()
   const [copyFeedback, showCopyFeedback] = useTransientMessage()
   const [monochrome, setMonochrome] = useState(false)
   const [schemeOverride, setSchemeOverride] = useState<'light' | 'dark' | null>(
@@ -49,7 +47,6 @@ export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
   const copyAction = locale.actions[copyUrlActionId]
   const monoAction = locale.actions[monoActionId]
   const darkAction = locale.actions[darkActionId]
-  const photosCopy = locale.links.photos
 
   useEffect(() => {
     analytics.track({ type: 'visit' })
@@ -136,37 +133,20 @@ export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
                 </section>
 
                 <section aria-label="Links" className="contents">
-                  {hubLinks.map((link) =>
-                    isConfiguredLink(link) ? (
-                      <GridCell key={link.id}>
-                        <LinkTile
-                          link={link}
-                          copy={locale.links[link.id]}
-                          onActivate={() =>
-                            analytics.track({
-                              type: 'link_click',
-                              linkId: link.id,
-                            })
-                          }
-                        />
-                      </GridCell>
-                    ) : (
-                      <GridCell key={link.id}>
-                        <ButtonTile
-                          art={tileArt.photos}
-                          copy={{
-                            label: photosCopy.label,
-                            title: photosCopy.title,
-                          }}
-                          message={photosMessage}
-                          tone="pending"
-                          onActivate={() =>
-                            showPhotosMessage(photosCopy.comingSoon)
-                          }
-                        />
-                      </GridCell>
-                    ),
-                  )}
+                  {hubLinks.map((link) => (
+                    <GridCell key={link.id}>
+                      <LinkTile
+                        link={link}
+                        copy={locale.links[link.id]}
+                        onActivate={() =>
+                          analytics.track({
+                            type: 'link_click',
+                            linkId: link.id,
+                          })
+                        }
+                      />
+                    </GridCell>
+                  ))}
                 </section>
 
                 <section aria-label="Actions" className="contents">
@@ -209,6 +189,9 @@ export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
                 </section>
               </main>
 
+              <GridCell>
+                <div className="h-full min-h-16" aria-hidden="true" />
+              </GridCell>
               <GridCell>
                 <div className="h-full min-h-16" aria-hidden="true" />
               </GridCell>

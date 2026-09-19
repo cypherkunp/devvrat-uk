@@ -11,12 +11,12 @@ describe('GA4 analytics adapter', () => {
     })
 
     analytics.track({ type: 'visit' })
-    analytics.track({ type: 'link_click', linkId: 'email' })
+    analytics.track({ type: 'link_click', linkId: 'github' })
     analytics.track({ type: 'action_click', actionId: 'copy-url' })
 
     expect(gtag).toHaveBeenCalledWith('event', 'visit')
     expect(gtag).toHaveBeenCalledWith('event', 'link_click', {
-      link_id: 'email',
+      link_id: 'github',
     })
     expect(gtag).toHaveBeenCalledWith('event', 'action_click', {
       action_id: 'copy-url',

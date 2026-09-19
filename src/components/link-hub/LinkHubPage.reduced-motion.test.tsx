@@ -58,7 +58,7 @@ describe('Link Hub page with reduced motion', () => {
     }
   })
 
-  it('keeps Links, the Photos placeholder, and Copy URL operable', async () => {
+  it('keeps Links and Copy URL operable', async () => {
     const writeText = vi.fn().mockResolvedValue(undefined)
     Object.defineProperty(navigator, 'clipboard', {
       configurable: true,
@@ -66,28 +66,21 @@ describe('Link Hub page with reduced motion', () => {
     })
 
     const { locale, analytics } = renderPage()
-    const photos = locale.links.photos
     const action = locale.actions['copy-url']
 
     fireEvent.click(
       screen.getByRole('link', {
-        name: linkName(locale.links.email),
-      }),
-    )
-    fireEvent.click(
-      screen.getByRole('button', {
-        name: `${photos.label}: ${photos.title}`,
+        name: linkName(locale.links.photos),
       }),
     )
     fireEvent.click(
       screen.getByRole('button', { name: `${action.label}: ${action.title}` }),
     )
 
-    expect(screen.getByText(photos.comingSoon)).toBeTruthy()
     expect(await screen.findByText(action.success)).toBeTruthy()
     expect(analytics.events).toContainEqual({
       type: 'link_click',
-      linkId: 'email',
+      linkId: 'photos',
     })
     expect(analytics.events).toContainEqual({
       type: 'action_click',
