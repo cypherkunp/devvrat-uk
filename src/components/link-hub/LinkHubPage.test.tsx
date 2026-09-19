@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { createFakeAnalytics } from '#/analytics/port'
 import { loadLocale } from '#/content/locale'
-import { LinkHubPage } from '#/link-hub/LinkHubPage'
+import { LinkHubPage } from '#/components/link-hub/LinkHubPage'
 
 afterEach(() => {
   cleanup()

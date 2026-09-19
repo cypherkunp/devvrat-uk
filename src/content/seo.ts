@@ -1,15 +1,11 @@
 import {
   hubLinks,
   hubOrigin,
+  isConfiguredLink,
   resumeHref,
-  type ConfiguredLink,
-  type HubLink,
 } from '#/content/hub-config'
+import type { HubLink } from '#/content/hub-config'
 import type { Locale } from '#/content/locale'
-
-function isConfigured(link: HubLink): link is ConfiguredLink {
-  return 'href' in link
-}
 
 function isIdentityProfileUrl(href: string) {
   return (
@@ -19,7 +15,7 @@ function isIdentityProfileUrl(href: string) {
 
 export function ownerEmail(links: HubLink[] = hubLinks): string | undefined {
   const mailto = links
-    .filter(isConfigured)
+    .filter(isConfiguredLink)
     .find((link) => link.href.startsWith('mailto:'))
   return mailto?.href.slice('mailto:'.length)
 }
@@ -29,7 +25,7 @@ export function ownerSameAsUrls(
   resume = resumeHref,
 ): string[] {
   const urls = links
-    .filter(isConfigured)
+    .filter(isConfiguredLink)
     .map((link) => link.href)
     .filter(isIdentityProfileUrl)
 

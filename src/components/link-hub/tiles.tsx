@@ -2,10 +2,10 @@ import { AnimatePresence, motion } from 'motion/react'
 
 import type { ConfiguredLink } from '#/content/hub-config'
 import type { LinkCopy } from '#/content/locale'
-import { Badge } from '#/geist/components'
-import { feedbackEnter, feedbackExit } from '#/link-hub/motion'
-import { tileArt } from '#/link-hub/tile-art'
-import type { TileArt } from '#/link-hub/tile-art'
+import { Badge } from '#/components/geist/components'
+import { feedbackEnter, feedbackExit } from '#/components/link-hub/motion'
+import { tileArt } from '#/components/link-hub/tile-art'
+import type { TileArt } from '#/components/link-hub/tile-art'
 
 /** Interactive surface — hover/press are CSS so they stay compositor-friendly. */
 export function tileClass(

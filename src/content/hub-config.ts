@@ -20,6 +20,10 @@ export type PlaceholderLink = {
 
 export type HubLink = ConfiguredLink | PlaceholderLink
 
+export function isConfiguredLink(link: HubLink): link is ConfiguredLink {
+  return 'href' in link
+}
+
 export type ActionId = 'copy-url' | 'mono' | 'dark'
 
 export const hubOrigin = 'https://devvrat.uk'

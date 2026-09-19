@@ -10,7 +10,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
 const source = 'public/portrait.jpg'
-const target = 'src/link-hub/portrait-ascii.ts'
+const target = 'src/components/link-hub/portrait-ascii.ts'
 
 const columns = 78
 // Monospace cells are about twice as tall as they are wide.

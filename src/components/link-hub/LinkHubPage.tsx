@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, useSyncExternalStore } from 'react'
+import { useEffect, useState } from 'react'
 import { MotionConfig, motion } from 'motion/react'
 
 import type { AnalyticsPort } from '#/analytics/port'
@@ -6,10 +6,10 @@ import {
   copyUrlActionId,
   darkActionId,
   hubLinks,
+  isConfiguredLink,
   monoActionId,
   resumeHref,
 } from '#/content/hub-config'
-import type { ConfiguredLink, HubLink } from '#/content/hub-config'
 import type { Locale } from '#/content/locale'
 import {
   Grid,
@@ -17,90 +17,23 @@ import {
   GridCrosses,
   GridPage,
   GridSystem,
-} from '#/geist/components'
-import { portraitAscii, portraitAsciiColumns } from '#/link-hub/portrait-ascii'
-import { easeOut, springDefault } from '#/link-hub/motion'
-import { tileArt } from '#/link-hub/tile-art'
-import { ButtonTile, LinkTile, StaticTile, SwitchTile } from '#/link-hub/tiles'
+} from '#/components/geist/components'
+import { AsciiPortrait } from '#/components/link-hub/ascii-portrait'
+import { HubFooter } from '#/components/link-hub/hub-footer'
+import { useOsDark, useTransientMessage } from '#/components/link-hub/hooks'
+import { easeOut, springDefault } from '#/components/link-hub/motion'
+import { tileArt } from '#/components/link-hub/tile-art'
+import {
+  ButtonTile,
+  LinkTile,
+  StaticTile,
+  SwitchTile,
+} from '#/components/link-hub/tiles'
 
 export type LinkHubPageProps = {
   locale: Locale
   analytics: AnalyticsPort
   hubUrl: string
-}
-
-const messageDurationMs = 2400
-
-function subscribeOsDark(onStoreChange: () => void) {
-  if (typeof window.matchMedia !== 'function') return () => {}
-  const mq = window.matchMedia('(prefers-color-scheme: dark)')
-  mq.addEventListener('change', onStoreChange)
-  return () => mq.removeEventListener('change', onStoreChange)
-}
-
-function getOsDark() {
-  if (typeof window.matchMedia !== 'function') return false
-  return window.matchMedia('(prefers-color-scheme: dark)').matches
-}
-
-/** Server snapshot is light — CSS media query still paints OS dark on first frame. */
-function useOsDark() {
-  return useSyncExternalStore(subscribeOsDark, getOsDark, () => false)
-}
-
-function isConfigured(link: HubLink): link is ConfiguredLink {
-  return 'href' in link
-}
-
-/** A message that shows itself for a beat and then clears. */
-function useTransientMessage(durationMs = messageDurationMs) {
-  const [current, setCurrent] = useState<{ text: string } | null>(null)
-
-  useEffect(() => {
-    if (!current) return
-    const timer = setTimeout(() => setCurrent(null), durationMs)
-    return () => clearTimeout(timer)
-  }, [current, durationMs])
-
-  const show = useCallback((text: string) => setCurrent({ text }), [])
-
-  return [current?.text ?? null, show] as const
-}
-
-/* A monospace cell is ~0.6em wide, so the grid spans this many ems; sizing the
-   font off the container width makes the art fill the frame at any breakpoint.
-   The extra 0.4 is slack for mono faces whose advance runs a hair over 0.6em. */
-const asciiWidthEm = portraitAsciiColumns * 0.6 + 0.4
-
-function AsciiPortrait({ alt }: { alt: string }) {
-  return (
-    <span
-      role="img"
-      aria-label={alt}
-      className="@container relative isolate flex size-full min-h-64 items-center justify-center overflow-hidden md:min-h-0"
-    >
-      <pre
-        aria-hidden="true"
-        className="m-0 bg-gradient-to-b from-[var(--hub-fg)] via-[#424245] to-[var(--hub-muted)] bg-clip-text font-mono text-transparent"
-        style={{
-          fontSize: `calc(100cqw / ${asciiWidthEm})`,
-          lineHeight: 1.14,
-        }}
-      >
-        {portraitAscii}
-      </pre>
-    </span>
-  )
-}
-
-function HubFooter({ credit, rights }: Locale['footer']) {
-  return (
-    <footer className="tile tile-static flex h-full min-h-16 w-full items-center px-4 py-3 text-left text-[var(--hub-muted)] md:text-center">
-      <p className="w-full font-mono text-[12px] leading-4 md:whitespace-nowrap lg:text-[10px]">
-        {`${credit}. ${rights}`}
-      </p>
-    </footer>
-  )
 }
 
 export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
@@ -204,7 +137,7 @@ export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
 
                 <section aria-label="Links" className="contents">
                   {hubLinks.map((link) =>
-                    isConfigured(link) ? (
+                    isConfiguredLink(link) ? (
                       <GridCell key={link.id}>
                         <LinkTile
                           link={link}

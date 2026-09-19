@@ -194,6 +194,6 @@ describe('Owner Identity markup', () => {
       content: 'devvrathq',
     })
     expect(head.scripts[0]?.type).toBe('application/ld+json')
-    expect(JSON.parse(head.scripts[0]!.children)).toEqual(linkHubJsonLd(locale))
+    expect(JSON.parse(head.scripts[0].children)).toEqual(linkHubJsonLd(locale))
   })
 })

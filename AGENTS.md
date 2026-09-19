@@ -11,3 +11,7 @@ Canonical roles map 1:1 to tracker labels (`needs-triage`, `needs-info`, `ready-
 ### Domain docs
 
 Single-context: root `CONTEXT.md` + `docs/adr/`. See `docs/agents/domain.md`.
+
+### Clean code
+
+When writing, moving, or splitting modules, components, or routes. See `docs/agents/clean-code.md`.
