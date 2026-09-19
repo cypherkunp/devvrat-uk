@@ -93,7 +93,7 @@ describe('Link Hub page', () => {
     expect(document.querySelector('a[href^="mailto:"]')).toBeNull()
     expect(screen.queryByText('Email')).toBeNull()
     expect(screen.queryByText('Central Hub')).toBeNull()
-    expect(locale.links['central-hub'].label).toBe('Portfolio Site')
+    expect(locale.links['central-hub'].label).toBe('Portfolio')
 
     const resume = screen.getByRole('link', {
       name: linkName({
