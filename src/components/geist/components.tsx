@@ -371,3 +371,38 @@ export function Badge({
     </span>
   )
 }
+
+export function Avatar({
+  size = 32,
+  src,
+  title,
+  letter,
+  placeholder = false,
+}: {
+  size?: number
+  src?: string
+  title?: string
+  letter?: string
+  placeholder?: boolean
+}): JSX.Element {
+  const label = title
+    ? title
+    : letter
+      ? `Avatar with initials: ${letter}`
+      : undefined
+
+  return (
+    <span
+      className="geist-avatar"
+      data-placeholder={placeholder ? '' : undefined}
+      style={{ width: size, height: size }}
+      {...(src ? {} : { role: 'img' as const, 'aria-label': label })}
+    >
+      {src ? (
+        <img src={src} alt={label ?? ''} width={size} height={size} />
+      ) : letter && !placeholder ? (
+        <span aria-hidden="true">{letter}</span>
+      ) : null}
+    </span>
+  )
+}

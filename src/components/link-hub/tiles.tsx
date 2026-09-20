@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 
 import type { ConfiguredLink } from '#/content/hub-config'
@@ -143,29 +144,42 @@ export function StaticTile({
   titleAs,
   showLabel = true,
   align = 'center',
+  accessory,
 }: {
   copy: LinkCopy
   titleAs?: 'h1'
   showLabel?: boolean
   align?: 'left' | 'center'
+  accessory?: ReactNode
 }) {
   const Title = titleAs ?? 'p'
+  const titleClass =
+    titleAs === 'h1'
+      ? 'display-title m-0 min-w-0 text-4xl text-[var(--hub-fg)] md:text-5xl lg:text-6xl !leading-none'
+      : 'text-copy-16 min-w-0 text-[var(--hub-muted)]'
+  const title = <Title className={titleClass}>{copy.title}</Title>
+  const label = showLabel ? (
+    <Badge variant="gray" contrast="low">
+      {copy.label}
+    </Badge>
+  ) : null
+
   return (
     <div className={tileClass(true, align)}>
-      {showLabel ? (
-        <Badge variant="gray" contrast="low">
-          {copy.label}
-        </Badge>
-      ) : null}
-      <Title
-        className={
-          titleAs === 'h1'
-            ? 'display-title min-w-0 text-4xl text-[var(--hub-fg)] md:text-5xl lg:text-6xl'
-            : 'text-copy-16 min-w-0 text-[var(--hub-muted)]'
-        }
-      >
-        {copy.title}
-      </Title>
+      {accessory ? (
+        <span className="flex w-full min-w-0 flex-row items-center justify-between gap-4 lg:w-auto lg:max-h-full lg:flex-col lg:items-center lg:gap-4 lg:self-center">
+          <span className="flex min-w-0 flex-col gap-3 lg:w-fit lg:shrink-0 lg:items-center">
+            {label}
+            {title}
+          </span>
+          <span className="tile-accessory">{accessory}</span>
+        </span>
+      ) : (
+        <>
+          {label}
+          {title}
+        </>
+      )}
     </div>
   )
 }

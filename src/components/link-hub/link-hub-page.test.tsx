@@ -53,15 +53,16 @@ describe('Link Hub page', () => {
     expect(screen.getByText(locale.identity.availability)).toBeTruthy()
     expect(locale.identity.availability).toBe('Available for Hire')
 
-    // The portrait is ASCII art, so it carries its meaning through the label
-    // rather than through an image request.
     const portrait = screen.getByRole('img', {
       name: locale.identity.portraitAlt,
     })
-    expect(portrait.querySelector('img')).toBeNull()
-    expect(portrait.querySelector('pre')?.getAttribute('aria-hidden')).toBe(
-      'true',
-    )
+    const name = screen.getByRole('heading', {
+      level: 1,
+      name: locale.identity.displayName,
+    })
+    expect(portrait.getAttribute('src')).toBe('/portrait.jpg')
+    expect(portrait.closest('.geist-avatar')).toBeTruthy()
+    expect(name.closest('.tile')?.contains(portrait)).toBe(true)
 
     expect(screen.queryByText(/EST\./i)).toBeNull()
     expect(screen.queryByRole('button', { name: /^share$/i })).toBeNull()

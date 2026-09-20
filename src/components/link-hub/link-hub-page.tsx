@@ -11,13 +11,13 @@ import {
 } from '#/content/hub-config'
 import type { Locale } from '#/content/locale'
 import {
+  Avatar,
   Grid,
   GridCell,
   GridCrosses,
   GridPage,
   GridSystem,
 } from '#/components/geist/components'
-import { AsciiPortrait } from '#/components/link-hub/ascii-portrait'
 import { HubFooter } from '#/components/link-hub/hub-footer'
 import { useOsDark, useTransientMessage } from '#/components/link-hub/hooks'
 import { easeOut, springDefault } from '#/components/link-hub/motion'
@@ -96,10 +96,18 @@ export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
                   <GridCell>
                     <StaticTile
                       titleAs="h1"
+                      align="left"
                       copy={{
                         label: identity.role,
                         title: identity.displayName,
                       }}
+                      accessory={
+                        <Avatar
+                          size={80}
+                          src="/portrait.jpg"
+                          title={identity.portraitAlt}
+                        />
+                      }
                     />
                   </GridCell>
                   <GridCell>
@@ -111,9 +119,6 @@ export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
                         title: identity.bio,
                       }}
                     />
-                  </GridCell>
-                  <GridCell>
-                    <AsciiPortrait alt={identity.portraitAlt} />
                   </GridCell>
                   <GridCell>
                     <LinkTile
@@ -189,6 +194,9 @@ export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
                 </section>
               </main>
 
+              <GridCell>
+                <div className="h-full min-h-16" aria-hidden="true" />
+              </GridCell>
               <GridCell>
                 <div className="h-full min-h-16" aria-hidden="true" />
               </GridCell>

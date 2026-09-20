@@ -229,7 +229,20 @@ body {
   background: var(--ds-background-100);
 }
 
+@media (min-width: 1024px) {
+  .geist-grid-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
 .geist-grid-system {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 80rem;
+  margin-inline: auto;
   padding: 12px;
 }
 
@@ -395,10 +408,14 @@ body {
 }
 
 @media (min-width: 1024px) {
+  .hub-grid {
+    --hub-row-max: 224px;
+  }
+
   .hub-grid,
   .hub-grid .geist-grid {
-    height: calc(100dvh - 24px);
-    max-height: calc(100dvh - 24px);
+    height: min(calc(100dvh - 24px), calc(4 * var(--hub-row-max)));
+    max-height: min(calc(100dvh - 24px), calc(4 * var(--hub-row-max)));
   }
 
   .hub-grid .geist-grid {
@@ -514,6 +531,60 @@ body {
   .tile[data-highlighted='true']:hover .tile-arrow {
     color: var(--hub-fg);
   }
+}
+
+.tile-accessory {
+  flex-shrink: 0;
+}
+
+@media (min-width: 1024px) {
+  .tile-accessory {
+    flex: 0 1 80px;
+    width: auto;
+    height: 80px;
+    max-height: 80px;
+    min-height: 0;
+    aspect-ratio: 1;
+  }
+
+  .tile-accessory .geist-avatar {
+    width: 100% !important;
+    height: 100% !important;
+  }
+}
+
+.geist-avatar {
+  display: inline-flex;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--hub-portrait-bg);
+  box-shadow: 0 0 0 1px var(--ds-gray-alpha-400);
+}
+
+.geist-avatar img,
+.geist-avatar span {
+  width: 100%;
+  height: 100%;
+}
+
+.geist-avatar img {
+  object-fit: cover;
+  object-position: center 38%;
+  filter: grayscale(1);
+}
+
+.geist-avatar span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75em;
+  font-weight: 500;
+  color: var(--hub-fg);
+}
+
+.geist-avatar[data-placeholder] {
+  background: var(--ds-gray-200);
 }
 
 .geist-badge {
