@@ -10,22 +10,22 @@
   "links": {
     "twitter": {
       "label": "Twitter",
-      "title": "Signal",
+      "title": "Twitter",
       "handle": "@devvrathq"
     },
     "linkedin": {
       "label": "LinkedIn",
-      "title": "Proof of work",
+      "title": "LinkedIn",
       "handle": "devvratshukla"
     },
     "github": {
       "label": "GitHub",
-      "title": "Repositories",
+      "title": "GitHub",
       "handle": "cypherkunp"
     },
     "central-hub": {
       "label": "Portfolio",
-      "title": "Primary site",
+      "title": "Portfolio",
       "handle": "devvrat.cc"
     },
     "handbook": {
@@ -34,14 +34,14 @@
       "handle": "devvrat.cc/posts/handbook"
     },
     "photos": {
-      "label": "Photos",
-      "title": "Gallery",
+      "label": "Photography",
+      "title": "Photography",
       "handle": "devvrat.cc/photos"
     },
     "resume": {
       "label": "Availability",
       "title": "Available for Hire",
-      "handle": "devvrat.cc/resume"
+      "handle": "devvrat.cc/about"
     }
   },
   "actions": {

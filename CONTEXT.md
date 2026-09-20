@@ -18,13 +18,13 @@ _Avoid_: Profile block, about section, hero (as a product term); ACTIVE / AVAILA
 
 **Link**:
 An outbound destination shown as a tile on the Link Hub (label, title, optional handle, destination URL). Launch set:
-- Availability → `https://www.devvrat.cc/resume`
 - Portfolio Site → `https://devvrat.cc`
+- Availability → `https://www.devvrat.cc/about`
+- Handbook → `https://www.devvrat.cc/posts/handbook`
 - LinkedIn → `https://www.linkedin.com/in/devvratshukla`
 - GitHub → `https://github.com/cypherkunp`
 - Twitter → `https://x.com/devvrathq`
-- Handbook → `https://www.devvrat.cc/posts/handbook`
-- Photos → `https://www.devvrat.cc/photos`
+- Photography → `https://www.devvrat.cc/photos`
 _Avoid_: Card, button, social (as the noun for one entry)
 
 **Action**:

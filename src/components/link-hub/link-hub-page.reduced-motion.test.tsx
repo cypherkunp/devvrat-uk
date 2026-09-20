@@ -41,9 +41,9 @@ function renderPage() {
 }
 
 function linkName(copy: { label: string; title: string; handle?: string }) {
-  return copy.handle
-    ? `${copy.label}: ${copy.title} (${copy.handle})`
-    : `${copy.label}: ${copy.title}`
+  const name =
+    copy.title === copy.label ? copy.label : `${copy.label}: ${copy.title}`
+  return copy.handle ? `${name} (${copy.handle})` : name
 }
 
 describe('Link Hub page with reduced motion', () => {
@@ -54,7 +54,7 @@ describe('Link Hub page with reduced motion', () => {
     expect(screen.getByText(locale.identity.availability)).toBeTruthy()
 
     for (const copy of Object.values(locale.links)) {
-      expect(screen.getByText(copy.title)).toBeTruthy()
+      expect(screen.getAllByText(copy.title).length).toBeGreaterThan(0)
     }
   })
 

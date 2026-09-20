@@ -14,7 +14,10 @@ export function tileClass(
   align: 'left' | 'center' = 'left',
 ) {
   return [
-    'tile group relative isolate flex h-full min-h-24 w-full flex-col px-4 py-3.5',
+    'tile group relative isolate flex h-full w-full px-4 py-7',
+    staticTile
+      ? 'min-h-24 flex-col'
+      : 'min-h-16 flex-row items-center gap-3 md:min-h-24 md:flex-col md:items-stretch md:gap-0',
     align === 'center'
       ? 'items-start justify-center gap-3 text-left md:items-center md:text-center'
       : staticTile
@@ -28,7 +31,8 @@ export function tileClass(
 }
 
 function controlLabel({ label, title, handle }: LinkCopy) {
-  return handle ? `${label}: ${title} (${handle})` : `${label}: ${title}`
+  const name = title === label ? label : `${label}: ${title}`
+  return handle ? `${name} (${handle})` : name
 }
 
 function TileChip({ art, filled = false }: { art: TileArt; filled?: boolean }) {
@@ -53,7 +57,7 @@ function TileArrow() {
   return (
     <span
       aria-hidden="true"
-      className="tile-arrow shrink-0 text-[var(--hub-muted)]"
+      className="tile-arrow max-md:hidden shrink-0 text-[var(--hub-muted)]"
     >
       ↗
     </span>
@@ -62,7 +66,7 @@ function TileArrow() {
 
 function TileLabel({ label }: Pick<LinkCopy, 'label'>) {
   return (
-    <span className="text-label-13 min-w-0 flex-1 truncate text-[var(--hub-muted)]">
+    <span className="text-label-13 max-md:hidden min-w-0 flex-1 truncate text-[var(--hub-muted)]">
       {label}
     </span>
   )
@@ -70,7 +74,7 @@ function TileLabel({ label }: Pick<LinkCopy, 'label'>) {
 
 function TileCaption({ title, handle }: Omit<LinkCopy, 'label'>) {
   return (
-    <span className="mt-auto block pt-5">
+    <span className="block min-w-0 flex-1 md:mt-auto md:pt-5">
       <span className="text-label-14 block text-[var(--hub-fg)]">{title}</span>
       {handle ? (
         <span className="text-label-13-mono mt-0.5 block text-[var(--hub-muted)]">
@@ -205,7 +209,7 @@ export function LinkTile({
       className={tileClass()}
       onClick={onActivate}
     >
-      <span className="flex items-center gap-3">
+      <span className="flex shrink-0 items-center gap-3 md:w-full">
         <TileChip art={art} filled={link.highlighted} />
         <TileLabel label={copy.label} />
         <TileArrow />
@@ -235,11 +239,11 @@ export function ButtonTile({
       className={tileClass()}
       onClick={onActivate}
     >
-      <span className="flex items-center gap-3">
+      <span className="flex shrink-0 items-center gap-3 md:w-full">
         <TileChip art={art} />
         <TileLabel label={copy.label} />
       </span>
-      <span className="mt-auto block min-h-[2.75rem] pt-5">
+      <span className="block min-w-0 flex-1 md:mt-auto md:min-h-[2.75rem] md:pt-5">
         <AnimatePresence initial={false}>
           {message ? (
             <StatusMessage key="status" tone={tone}>
@@ -288,11 +292,11 @@ export function SwitchTile({
       className={tileClass()}
       onClick={() => onCheckedChange(!checked)}
     >
-      <span className="flex items-center gap-3">
+      <span className="flex shrink-0 items-center gap-3 md:w-full">
         <TileChip art={art} />
         <TileLabel label={copy.label} />
       </span>
-      <span className="mt-auto flex items-end justify-between gap-3 pt-5">
+      <span className="flex min-w-0 flex-1 items-center justify-between gap-3 md:mt-auto md:items-end md:pt-5">
         <span className="text-label-14 text-[var(--hub-fg)]">{copy.title}</span>
         <GeistToggle on={checked} />
       </span>

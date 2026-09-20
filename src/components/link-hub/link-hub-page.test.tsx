@@ -23,9 +23,9 @@ function renderPage() {
 }
 
 function linkName(copy: { label: string; title: string; handle?: string }) {
-  return copy.handle
-    ? `${copy.label}: ${copy.title} (${copy.handle})`
-    : `${copy.label}: ${copy.title}`
+  const name =
+    copy.title === copy.label ? copy.label : `${copy.label}: ${copy.title}`
+  return copy.handle ? `${name} (${copy.handle})` : name
 }
 
 describe('Link Hub page', () => {
@@ -73,7 +73,7 @@ describe('Link Hub page', () => {
         title: locale.identity.availability,
       }),
     })
-    expect(resume.getAttribute('href')).toBe('https://www.devvrat.cc/resume')
+    expect(resume.getAttribute('href')).toBe('https://www.devvrat.cc/about')
     expect(screen.getByText(locale.links.resume.handle!)).toBeTruthy()
   })
 
@@ -88,7 +88,7 @@ describe('Link Hub page', () => {
     expect(footer.closest('main')).toBeNull()
   })
 
-  it('routes configured Links in hire-first order and highlights Portfolio Site', () => {
+  it('routes configured Links with Portfolio, hire, then Handbook first', () => {
     const { locale } = renderPage()
 
     expect(document.querySelector('a[href^="mailto:"]')).toBeNull()
@@ -121,7 +121,7 @@ describe('Link Hub page', () => {
       name: linkName(locale.links.photos),
     })
 
-    expect(resume.getAttribute('href')).toBe('https://www.devvrat.cc/resume')
+    expect(resume.getAttribute('href')).toBe('https://www.devvrat.cc/about')
     expect(portfolio.getAttribute('href')).toBe('https://devvrat.cc')
     expect(portfolio.getAttribute('data-highlighted')).toBe('true')
     expect(linkedin.getAttribute('href')).toBe(
@@ -137,12 +137,12 @@ describe('Link Hub page', () => {
     expect(
       screen.getAllByRole('link').map((link) => link.getAttribute('href')),
     ).toEqual([
-      resume.getAttribute('href'),
       portfolio.getAttribute('href'),
+      resume.getAttribute('href'),
+      handbook.getAttribute('href'),
       linkedin.getAttribute('href'),
       github.getAttribute('href'),
       twitter.getAttribute('href'),
-      handbook.getAttribute('href'),
       photos.getAttribute('href'),
     ])
   })

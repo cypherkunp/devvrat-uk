@@ -1,13 +1,10 @@
 import { expect, test } from '@playwright/test'
 
-import { hubLinks, resumeHref } from '../src/content/hub-config'
+import { hubLinks } from '../src/content/hub-config'
 
-const outboundHttpHrefs = [
-  resumeHref,
-  ...hubLinks.flatMap((link) =>
-    link.href.startsWith('http') ? [link.href] : [],
-  ),
-]
+const outboundHttpHrefs = hubLinks.flatMap((link) =>
+  link.href.startsWith('http') ? [link.href] : [],
+)
 
 test('Link Hub loads in the browser', async ({ page }) => {
   const response = await page.goto('/')

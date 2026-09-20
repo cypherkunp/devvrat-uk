@@ -7,7 +7,6 @@ import {
   darkActionId,
   hubLinks,
   monoActionId,
-  resumeHref,
 } from '#/content/hub-config'
 import type { Locale } from '#/content/locale'
 import {
@@ -120,21 +119,6 @@ export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
                       }}
                     />
                   </GridCell>
-                  <GridCell>
-                    <LinkTile
-                      link={{ id: 'resume', href: resumeHref }}
-                      copy={{
-                        ...locale.links.resume,
-                        title: identity.availability,
-                      }}
-                      onActivate={() =>
-                        analytics.track({
-                          type: 'link_click',
-                          linkId: 'resume',
-                        })
-                      }
-                    />
-                  </GridCell>
                 </section>
 
                 <section aria-label="Links" className="contents">
@@ -142,7 +126,14 @@ export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
                     <GridCell key={link.id}>
                       <LinkTile
                         link={link}
-                        copy={locale.links[link.id]}
+                        copy={
+                          link.id === 'resume'
+                            ? {
+                                ...locale.links.resume,
+                                title: identity.availability,
+                              }
+                            : locale.links[link.id]
+                        }
                         onActivate={() =>
                           analytics.track({
                             type: 'link_click',

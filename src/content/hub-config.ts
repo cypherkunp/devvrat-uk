@@ -32,7 +32,7 @@ export function apexLocation(
   return url.href
 }
 
-export const resumeHref = 'https://www.devvrat.cc/resume'
+export const resumeHref = 'https://www.devvrat.cc/about'
 
 export const copyUrlActionId = 'copy-url' as const satisfies ActionId
 export const monoActionId = 'mono' as const satisfies ActionId
@@ -40,9 +40,10 @@ export const darkActionId = 'dark' as const satisfies ActionId
 
 export const hubLinks: HubLink[] = [
   { id: 'central-hub', href: 'https://devvrat.cc', highlighted: true },
+  { id: 'resume', href: resumeHref },
+  { id: 'handbook', href: 'https://www.devvrat.cc/posts/handbook' },
   { id: 'linkedin', href: 'https://www.linkedin.com/in/devvratshukla' },
   { id: 'github', href: 'https://github.com/cypherkunp' },
   { id: 'twitter', href: 'https://x.com/devvrathq' },
-  { id: 'handbook', href: 'https://www.devvrat.cc/posts/handbook' },
   { id: 'photos', href: 'https://www.devvrat.cc/photos' },
 ]
