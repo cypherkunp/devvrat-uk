@@ -85,10 +85,10 @@ describe('Owner Identity markup', () => {
   it('takes sameAs from https Links and the resume, skipping Photos and handbook/posts', () => {
     expect(ownerSameAsUrls()).toEqual([
       'https://devvrat.cc',
+      resumeHref,
       'https://www.linkedin.com/in/devvratshukla',
       'https://github.com/cypherkunp',
       'https://x.com/devvrathq',
-      resumeHref,
     ])
   })
 
