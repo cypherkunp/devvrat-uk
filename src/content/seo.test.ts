@@ -161,7 +161,7 @@ describe('Owner Identity markup', () => {
     })
     expect(head.meta).toContainEqual({
       property: 'og:image:height',
-      content: '1200',
+      content: '630',
     })
     expect(head.meta).toContainEqual({
       property: 'og:site_name',
@@ -169,8 +169,13 @@ describe('Owner Identity markup', () => {
     })
     expect(head.meta).toContainEqual({
       name: 'twitter:card',
-      content: 'summary',
+      content: 'summary_large_image',
     })
+    expect(head.meta).toContainEqual({
+      name: 'twitter:site',
+      content: '@devvrathq',
+    })
+    expect(locale.links.twitter.handle).toBe('@devvrathq')
     expect(head.meta).toContainEqual({
       name: 'twitter:image',
       content: `${hubOrigin}/og.jpg`,

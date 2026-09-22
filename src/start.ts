@@ -13,6 +13,19 @@ const redirectWww = createMiddleware().server(({ next, request }) => {
   return next()
 })
 
+const cacheDocument = createMiddleware().server(async ({ next }) => {
+  const result = await next()
+  const { response } = result
+  const type = response.headers.get('content-type') ?? ''
+  if (response.status !== 200 || !type.includes('text/html')) return result
+
+  response.headers.set(
+    'Cache-Control',
+    'public, max-age=0, s-maxage=86400, stale-while-revalidate=604800',
+  )
+  return result
+})
+
 export const startInstance = createStart(() => ({
-  requestMiddleware: [redirectWww],
+  requestMiddleware: [redirectWww, cacheDocument],
 }))
