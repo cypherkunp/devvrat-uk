@@ -150,7 +150,7 @@ export function IdentityTile({
 }) {
   return (
     <div className="tile tile-static identity-tile">
-      <h1 className="identity-name display-title m-0 min-w-0 text-5xl text-[var(--hub-fg)] lg:text-7xl !leading-none">
+      <h1 className="identity-name display-title m-0 min-w-0 text-[var(--hub-fg)]">
         {name}
       </h1>
       <span className="identity-role min-w-0">

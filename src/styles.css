@@ -542,11 +542,13 @@ body {
 }
 
 /*
- * Identity: name and portrait share a row on phones/tablets; on desktop the
- * portrait leads the 2×2 tile and the words settle at its foot.
+ * Identity: the name is the page's one loud move. It is sized off the tile's
+ * own width (cqi), so "Devvrat" spans the tile at every breakpoint. Phones and
+ * tablets share its row with the portrait; on desktop it fills the 2×2 foot.
  */
 .identity-tile {
   --portrait: 80px;
+  container-type: inline-size;
   display: grid;
   height: 100%;
   width: 100%;
@@ -564,6 +566,9 @@ body {
 .identity-name {
   grid-area: name;
   align-self: end;
+  font-size: 19cqi;
+  line-height: 0.86;
+  white-space: nowrap;
 }
 
 .identity-role {
@@ -598,7 +603,7 @@ body {
 
 @media (min-width: 1024px) {
   .identity-tile {
-    --portrait: clamp(104px, 20dvh, 176px);
+    --portrait: clamp(80px, 13dvh, 120px);
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: minmax(0, 1fr) auto auto auto;
     grid-template-areas:
@@ -613,6 +618,12 @@ body {
   .identity-portrait {
     justify-self: start;
     align-self: start;
+  }
+
+  /* Full width of the tile, capped by height so short screens keep the bio. */
+  .identity-name {
+    font-size: min(25.5cqi, 18dvh);
+    margin-left: -0.05em;
   }
 }
 
