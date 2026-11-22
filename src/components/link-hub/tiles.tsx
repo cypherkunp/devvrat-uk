@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'motion/react'
 
 import type { ConfiguredLink } from '#/content/hub-config'
 import type { LinkCopy } from '#/content/locale'
+import type { LinkTileCopy } from '#/content/og-preview'
 import { Badge } from '#/components/geist/components'
 import { feedbackEnter, feedbackExit } from '#/components/link-hub/motion'
 import { tileArt } from '#/components/link-hub/tile-art'
@@ -61,18 +62,47 @@ function TileRow({ children }: { children: ReactNode }) {
   )
 }
 
-function TileCaption({ title, handle }: Omit<LinkCopy, 'label'>) {
+function TileCaption({
+  title,
+  description,
+  handle,
+}: Omit<LinkTileCopy, 'label' | 'image'>) {
   return (
     <span className="min-w-0">
       <span className="text-label-14 block truncate text-[var(--hub-fg)]">
         {title}
       </span>
+      {description ? (
+        <span className="tile-description mt-0.5 line-clamp-2 text-[var(--hub-muted)]">
+          {description}
+        </span>
+      ) : null}
       {handle ? (
         <span className="text-label-13-mono mt-0.5 block truncate text-[var(--hub-muted)]">
           {handle}
         </span>
       ) : null}
     </span>
+  )
+}
+
+/**
+ * OG preview image at the OG card ratio (1.91:1). Decorative, since the title
+ * already names the Link; sized up front and lazy. Trails the caption on
+ * narrow tiles and sits above it on desktop, where tiles have spare height.
+ */
+function TilePreviewImage({ src }: { src: string }) {
+  return (
+    <img
+      src={src}
+      alt=""
+      width={122}
+      height={64}
+      loading="lazy"
+      decoding="async"
+      referrerPolicy="no-referrer"
+      className="h-10 w-[76px] shrink-0 rounded-[6px] object-cover max-md:ml-auto lg:order-first lg:h-16 lg:w-[122px]"
+    />
   )
 }
 
@@ -169,7 +199,7 @@ export function LinkTile({
   onActivate,
 }: {
   link: ConfiguredLink
-  copy: LinkCopy
+  copy: LinkTileCopy
   onActivate: () => void
 }) {
   const art = tileArt[link.id]
@@ -181,13 +211,18 @@ export function LinkTile({
       {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
       aria-label={controlLabel(copy)}
       data-highlighted={link.highlighted ? 'true' : undefined}
-      className={tileClass()}
+      className={`${tileClass()}${copy.image ? ' lg:flex-col' : ''}`}
       onClick={onActivate}
     >
       <TileRow>
         <TileChip art={art} filled={link.highlighted} />
-        <TileCaption title={copy.title} handle={copy.handle} />
+        <TileCaption
+          title={copy.title}
+          description={copy.description}
+          handle={copy.handle}
+        />
       </TileRow>
+      {copy.image ? <TilePreviewImage src={copy.image} /> : null}
     </a>
   )
 }

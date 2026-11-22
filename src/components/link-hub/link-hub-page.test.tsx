@@ -3,13 +3,14 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { createFakeAnalytics } from '#/analytics/port'
 import { loadLocale } from '#/content/locale'
+import type { OgPreviews } from '#/content/og-preview'
 import { LinkHubPage } from '#/components/link-hub/link-hub-page'
 
 afterEach(() => {
   cleanup()
 })
 
-function renderPage() {
+function renderPage(ogPreviews: OgPreviews = {}) {
   const locale = loadLocale('en')
   const analytics = createFakeAnalytics()
   render(
@@ -17,6 +18,7 @@ function renderPage() {
       locale={locale}
       analytics={analytics}
       hubUrl="https://devvrat.uk"
+      ogPreviews={ogPreviews}
     />,
   )
   return { locale, analytics }
@@ -248,6 +250,60 @@ describe('Link Hub page', () => {
       type: 'link_click',
       linkId: 'projects',
     })
+  })
+
+  it('shows the OG preview on the opted-in Projects tile', () => {
+    const image = 'https://avatars.githubusercontent.com/u/1?v=4'
+    renderPage({
+      projects: {
+        title: 'Devvrat · Projects',
+        description: "Devvrat's projects and GitHub contribution history.",
+        image,
+      },
+    })
+
+    const projects = screen.getByRole('link', {
+      name: 'Projects: Devvrat · Projects (cypherkunp.github.io)',
+    })
+    expect(projects.getAttribute('href')).toBe('https://cypherkunp.github.io/')
+    expect(projects.textContent).toContain('Devvrat · Projects')
+    expect(projects.textContent).toContain(
+      "Devvrat's projects and GitHub contribution history.",
+    )
+    expect(projects.textContent).toContain('cypherkunp.github.io')
+
+    const preview = projects.querySelector('img')
+    expect(preview?.getAttribute('src')).toBe(image)
+    expect(preview?.getAttribute('alt')).toBe('')
+    expect(preview?.getAttribute('loading')).toBe('lazy')
+    expect(preview?.getAttribute('width')).toBeTruthy()
+    expect(preview?.getAttribute('height')).toBeTruthy()
+  })
+
+  it('falls back to Locale copy when the Projects tile has no OG preview', () => {
+    renderPage()
+
+    const projects = screen.getByRole('link', {
+      name: 'Projects (cypherkunp.github.io)',
+    })
+    expect(projects.querySelector('img')).toBeNull()
+    expect(projects.textContent).toBe('Projectscypherkunp.github.io')
+  })
+
+  it('ignores OG data for Links that do not opt in', () => {
+    const { locale } = renderPage({
+      github: {
+        title: 'Injected',
+        description: 'Not shown',
+        image: 'https://example.com/x.png',
+      },
+    })
+
+    const github = screen.getByRole('link', {
+      name: linkName(locale.links.github),
+    })
+    expect(github.textContent).toBe('GitHubcypherkunp')
+    expect(github.querySelector('img')).toBeNull()
   })
 
   it('records link_click for the resume Link on the hire tile', () => {

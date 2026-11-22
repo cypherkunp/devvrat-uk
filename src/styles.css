@@ -755,3 +755,9 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/* OG preview description: between the title and the handle in weight. */
+.tile-description {
+  font-size: 0.8125rem;
+  line-height: 1.125rem;
+}

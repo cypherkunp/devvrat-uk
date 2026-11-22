@@ -8,6 +8,14 @@ export type LinkCopy = {
   handle?: string
 }
 
+/** A Link as the Locale writes it. Fields left out may come from OG preview. */
+export type LinkLocaleCopy = {
+  label: string
+  title?: string
+  description?: string
+  handle?: string
+}
+
 export type ActionCopy = {
   label: string
   title: string
@@ -33,7 +41,7 @@ export type Locale = {
     handbook: LinkCopy
     photos: LinkCopy
     resume: LinkCopy
-    projects: LinkCopy
+    projects: LinkLocaleCopy
   }
   actions: {
     'copy-url': ActionCopy

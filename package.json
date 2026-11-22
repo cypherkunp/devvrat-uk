@@ -8,7 +8,8 @@
   "scripts": {
     "dev": "vite dev --port 3000",
     "generate-routes": "tsr generate",
-    "build": "vite build",
+    "og-previews": "node scripts/resolve-og-previews.ts",
+    "build": "pnpm og-previews && vite build",
     "preview": "vite preview",
     "test": "vitest run --pool=forks",
     "test:e2e": "playwright test",

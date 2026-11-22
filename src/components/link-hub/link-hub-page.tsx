@@ -9,6 +9,8 @@ import {
   monoActionId,
 } from '#/content/hub-config'
 import type { Locale } from '#/content/locale'
+import { mergeOgPreview } from '#/content/og-preview'
+import type { OgPreviews } from '#/content/og-preview'
 import {
   Avatar,
   Grid,
@@ -39,9 +41,16 @@ export type LinkHubPageProps = {
   locale: Locale
   analytics: AnalyticsPort
   hubUrl: string
+  /** Build-time OG preview snapshot; applied only to Links that opt in. */
+  ogPreviews?: OgPreviews
 }
 
-export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
+export function LinkHubPage({
+  locale,
+  analytics,
+  hubUrl,
+  ogPreviews = {},
+}: LinkHubPageProps) {
   const { identity } = locale
   const [copyFeedback, showCopyFeedback] = useTransientMessage<ActionMessage>()
   const [monochrome, setMonochrome] = useState(false)
@@ -129,14 +138,15 @@ export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
                     <GridCell key={link.id} solid={link.highlighted}>
                       <LinkTile
                         link={link}
-                        copy={
+                        copy={mergeOgPreview(
                           link.id === 'resume'
                             ? {
                                 ...locale.links.resume,
                                 title: identity.availability,
                               }
-                            : locale.links[link.id]
-                        }
+                            : locale.links[link.id],
+                          link.ogPreview ? ogPreviews[link.id] : undefined,
+                        )}
                         onActivate={() =>
                           analytics.track({
                             type: 'link_click',

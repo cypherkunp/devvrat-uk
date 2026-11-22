@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test'
 
 import { hubLinks } from '../src/content/hub-config'
+import snapshot from '../src/content/og-previews.json' with { type: 'json' }
 
 const outboundHttpHrefs = hubLinks.flatMap((link) =>
   link.href.startsWith('http') ? [link.href] : [],
@@ -37,6 +38,31 @@ test('Link Hub lists every outbound http Link', async ({ page }) => {
 
   expect(hrefs).toEqual([...outboundHttpHrefs].sort())
   expect(hrefs).toContain('https://cypherkunp.github.io/')
+})
+
+test('Link Hub renders OG preview from the build snapshot without fetching destinations', async ({
+  page,
+}) => {
+  const destinationRequests: string[] = []
+  page.on('request', (request) => {
+    if (request.resourceType() === 'image') return
+    if (outboundHttpHrefs.includes(request.url())) {
+      destinationRequests.push(request.url())
+    }
+  })
+
+  await page.goto('/')
+  await expect(
+    page.getByRole('heading', { level: 1, name: 'Devvrat' }),
+  ).toBeVisible()
+
+  const projects = page.locator('a[href="https://cypherkunp.github.io/"]')
+  const preview = snapshot.projects
+  await expect(projects).toContainText(preview.title)
+  await expect(projects).toContainText(preview.description)
+  await expect(projects.locator('img')).toHaveAttribute('src', preview.image)
+  await expect(projects.locator('img')).toHaveAttribute('alt', '')
+  expect(destinationRequests).toEqual([])
 })
 
 for (const href of outboundHttpHrefs) {

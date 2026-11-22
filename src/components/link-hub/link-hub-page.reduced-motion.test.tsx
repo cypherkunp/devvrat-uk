@@ -54,7 +54,9 @@ describe('Link Hub page with reduced motion', () => {
     expect(screen.getByText(locale.identity.availability)).toBeTruthy()
 
     for (const copy of Object.values(locale.links)) {
-      expect(screen.getAllByText(copy.title).length).toBeGreaterThan(0)
+      expect(
+        screen.getAllByText(copy.title ?? copy.label).length,
+      ).toBeGreaterThan(0)
     }
   })
 

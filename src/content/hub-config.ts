@@ -12,6 +12,8 @@ export type ConfiguredLink = {
   id: LinkId
   href: string
   highlighted?: boolean
+  /** Opt in to the OG preview of `href`, resolved at build time. */
+  ogPreview?: boolean
 }
 
 export type HubLink = ConfiguredLink
@@ -43,7 +45,7 @@ export const hubLinks: HubLink[] = [
   { id: 'central-hub', href: 'https://devvrat.cc', highlighted: true },
   { id: 'resume', href: resumeHref },
   { id: 'handbook', href: 'https://www.devvrat.cc/posts/handbook' },
-  { id: 'projects', href: 'https://cypherkunp.github.io/' },
+  { id: 'projects', href: 'https://cypherkunp.github.io/', ogPreview: true },
   { id: 'linkedin', href: 'https://www.linkedin.com/in/devvratshukla' },
   { id: 'github', href: 'https://github.com/cypherkunp' },
   { id: 'twitter', href: 'https://x.com/devvrathq' },

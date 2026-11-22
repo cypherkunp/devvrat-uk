@@ -5,6 +5,7 @@ import { createAnalyticsFromEnv } from '#/analytics/create'
 import { LinkHubPage } from '#/components/link-hub/link-hub-page'
 import { hubOrigin } from '#/content/hub-config'
 import { loadLocale } from '#/content/locale'
+import { loadOgPreviews } from '#/content/og-preview-snapshot'
 
 export const Route = createFileRoute('/')({ component: LinkHubRoute })
 
@@ -13,5 +14,12 @@ function LinkHubRoute() {
   const analytics = useMemo(() => createAnalyticsFromEnv(), [])
   const hubUrl = hubOrigin
 
-  return <LinkHubPage locale={locale} analytics={analytics} hubUrl={hubUrl} />
+  return (
+    <LinkHubPage
+      locale={locale}
+      analytics={analytics}
+      hubUrl={hubUrl}
+      ogPreviews={loadOgPreviews()}
+    />
+  )
 }
