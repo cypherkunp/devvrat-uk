@@ -19,3 +19,7 @@ When writing, moving, splitting, or naming modules, components, or routes. See `
 ### Conventional commits
 
 When writing a git commit message. See `docs/agents/conventional-commits.md`.
+
+### Commit as you go
+
+Commit each finished, verified change straight to `main` without waiting to be asked. One logical change per commit, and only after typecheck, lint, and tests pass. Do not push unless asked.
