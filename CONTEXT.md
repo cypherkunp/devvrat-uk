@@ -27,7 +27,8 @@ An outbound destination shown as a tile on the Link Hub (label, title, optional 
 - GitHub → `https://github.com/cypherkunp`
 - Twitter → `https://x.com/devvrathq`
 - Photography → `https://www.devvrat.cc/photos`
-  _Avoid_: Card, button, social (as the noun for one entry)
+
+_Avoid_: Card, button, social (as the noun for one entry)
 
 **OG preview**:
 The Open Graph title, description and image of a Link's destination, shown on that Link's tile. A Link opts in from the hub config; previews are resolved at build time into a committed snapshot, so visitors never fetch destinations' pages. Locale copy wins and OG preview fills only the fields the Locale leaves out; the handle stays Locale-only. With no preview, the tile renders from Locale copy alone. Distinct from the Link Hub's own og:/twitter: share tags. Launch: Projects only.
