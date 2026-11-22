@@ -136,47 +136,32 @@ function CaptionBody({ title, handle }: Omit<LinkCopy, 'label'>) {
   )
 }
 
-export function StaticTile({
-  copy,
-  titleAs,
-  showLabel = true,
-  align = 'center',
-  accessory,
+/** The Owner: name leads, role and bio support, portrait anchors the tile. */
+export function IdentityTile({
+  name,
+  role,
+  bio,
+  portrait,
 }: {
-  copy: LinkCopy
-  titleAs?: 'h1'
-  showLabel?: boolean
-  align?: 'left' | 'center'
-  accessory?: ReactNode
+  name: string
+  role: string
+  bio: string
+  portrait: ReactNode
 }) {
-  const Title = titleAs ?? 'p'
-  const titleClass =
-    titleAs === 'h1'
-      ? 'display-title m-0 min-w-0 text-4xl text-[var(--hub-fg)] md:text-5xl lg:text-6xl !leading-none'
-      : 'text-copy-16 min-w-0 text-[var(--hub-muted)]'
-  const title = <Title className={titleClass}>{copy.title}</Title>
-  const label = showLabel ? (
-    <Badge variant="gray" contrast="low">
-      {copy.label}
-    </Badge>
-  ) : null
-
   return (
-    <div className={tileClass(true, align)}>
-      {accessory ? (
-        <span className="flex w-full min-w-0 flex-row items-center justify-between gap-4 lg:w-auto lg:max-h-full lg:flex-col lg:items-center lg:gap-4 lg:self-center">
-          <span className="flex min-w-0 flex-col gap-3 lg:w-fit lg:shrink-0 lg:items-center">
-            {label}
-            {title}
-          </span>
-          <span className="tile-accessory">{accessory}</span>
-        </span>
-      ) : (
-        <>
-          {label}
-          {title}
-        </>
-      )}
+    <div className="tile tile-static identity-tile">
+      <h1 className="identity-name display-title m-0 min-w-0 text-5xl text-[var(--hub-fg)] lg:text-7xl !leading-none">
+        {name}
+      </h1>
+      <span className="identity-role min-w-0">
+        <Badge variant="gray" contrast="low">
+          {role}
+        </Badge>
+      </span>
+      <p className="identity-bio text-copy-16 m-0 min-w-0 text-[var(--hub-muted)]">
+        {bio}
+      </p>
+      <span className="identity-portrait">{portrait}</span>
     </div>
   )
 }
@@ -210,7 +195,24 @@ export function LinkTile({
   )
 }
 
-export function ButtonTile({
+/** Actions are about the page, not the Owner: slim controls in one band, no chips. */
+const actionClass = [
+  'hub-action group flex min-h-12 min-w-0 flex-1 items-center gap-2 px-4 text-left',
+  'focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--ds-blue-700)]',
+].join(' ')
+
+function ActionGlyph({ art }: { art: TileArt }) {
+  return (
+    <span
+      aria-hidden="true"
+      className="hub-action-glyph flex size-4 shrink-0 text-[var(--hub-muted)]"
+    >
+      {art.glyph}
+    </span>
+  )
+}
+
+export function ActionButton({
   art,
   copy,
   message,
@@ -227,27 +229,22 @@ export function ButtonTile({
     <button
       type="button"
       aria-label={controlLabel(copy)}
-      className={tileClass()}
+      className={actionClass}
       onClick={onActivate}
     >
-      <TileRow>
-        <TileChip art={art} />
-        <span className="min-w-0">
-          <AnimatePresence initial={false}>
-            {message ? (
-              <StatusMessage key="status" tone={tone}>
-                {message}
-              </StatusMessage>
-            ) : (
-              <CaptionBody
-                key="caption"
-                title={copy.title}
-                handle={copy.handle}
-              />
-            )}
-          </AnimatePresence>
-        </span>
-      </TileRow>
+      <ActionGlyph art={art} />
+      {/* One grid cell: caption and status cross-fade in place, the row never grows. */}
+      <span className="grid min-w-0 items-center [&>*]:[grid-area:1/1]">
+        <AnimatePresence initial={false}>
+          {message ? (
+            <StatusMessage key="status" tone={tone}>
+              {message}
+            </StatusMessage>
+          ) : (
+            <CaptionBody key="caption" title={copy.title} />
+          )}
+        </AnimatePresence>
+      </span>
     </button>
   )
 }
@@ -262,7 +259,7 @@ function GeistToggle({ on }: { on: boolean }) {
   )
 }
 
-export function SwitchTile({
+export function ActionSwitch({
   art,
   copy,
   checked,
@@ -279,16 +276,14 @@ export function SwitchTile({
       role="switch"
       aria-checked={checked}
       aria-label={controlLabel(copy)}
-      className={tileClass()}
+      className={actionClass}
       onClick={() => onCheckedChange(!checked)}
     >
-      <TileRow>
-        <TileChip art={art} />
-        <span className="text-label-14 min-w-0 truncate text-[var(--hub-fg)]">
-          {copy.title}
-        </span>
-        <GeistToggle on={checked} />
-      </TileRow>
+      <ActionGlyph art={art} />
+      <span className="text-label-14 min-w-0 flex-1 truncate text-[var(--hub-fg)]">
+        {copy.title}
+      </span>
+      <GeistToggle on={checked} />
     </button>
   )
 }

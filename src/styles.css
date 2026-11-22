@@ -213,14 +213,14 @@ body {
 
 .display-title {
   font-weight: 600;
-  letter-spacing: -0.049em;
+  letter-spacing: -0.035em;
   line-height: 1.05;
   font-optical-sizing: auto;
 }
 
 @media (min-width: 768px) {
   .display-title {
-    letter-spacing: -0.052em;
+    letter-spacing: -0.04em;
   }
 }
 
@@ -407,19 +407,27 @@ body {
   width: 100%;
 }
 
+/* Desktop: three generous content rows, then a slim meta band (Actions + footer). */
 @media (min-width: 1024px) {
   .hub-grid {
-    --hub-row-max: 224px;
+    --hub-row-max: 248px;
+    --hub-band: 64px;
   }
 
   .hub-grid,
   .hub-grid .geist-grid {
-    height: min(calc(100dvh - 24px), calc(4 * var(--hub-row-max)));
-    max-height: min(calc(100dvh - 24px), calc(4 * var(--hub-row-max)));
+    height: min(
+      calc(100dvh - 24px),
+      calc(3 * var(--hub-row-max) + var(--hub-band))
+    );
+    max-height: min(
+      calc(100dvh - 24px),
+      calc(3 * var(--hub-row-max) + var(--hub-band))
+    );
   }
 
   .hub-grid .geist-grid {
-    grid-template-rows: repeat(4, minmax(0, 1fr));
+    grid-template-rows: repeat(3, minmax(0, 1fr)) var(--hub-band);
   }
 
   .hub-grid .tile {
@@ -533,23 +541,135 @@ body {
   }
 }
 
-.tile-accessory {
-  flex-shrink: 0;
+/*
+ * Identity: name and portrait share a row on phones/tablets; on desktop the
+ * portrait leads the 2×2 tile and the words settle at its foot.
+ */
+.identity-tile {
+  --portrait: 80px;
+  display: grid;
+  height: 100%;
+  width: 100%;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'name portrait'
+    'role portrait'
+    'bio  bio';
+  align-content: center;
+  align-items: center;
+  column-gap: 1rem;
+  padding: 1.75rem 1rem;
+}
+
+.identity-name {
+  grid-area: name;
+  align-self: end;
+}
+
+.identity-role {
+  grid-area: role;
+  align-self: start;
+  margin-top: 0.5rem;
+}
+
+.identity-bio {
+  grid-area: bio;
+  max-width: 44ch;
+  margin-top: 1.25rem;
+  text-wrap: pretty;
+}
+
+.identity-portrait {
+  grid-area: portrait;
+  justify-self: end;
+}
+
+.identity-portrait .geist-avatar {
+  width: var(--portrait) !important;
+  height: var(--portrait) !important;
+}
+
+@media (min-width: 768px) {
+  .identity-tile {
+    --portrait: 104px;
+    padding: 2rem 1.5rem;
+  }
 }
 
 @media (min-width: 1024px) {
-  .tile-accessory {
-    flex: 0 1 80px;
-    width: auto;
-    height: 80px;
-    max-height: 80px;
-    min-height: 0;
-    aspect-ratio: 1;
+  .identity-tile {
+    --portrait: clamp(104px, 20dvh, 176px);
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto auto auto;
+    grid-template-areas:
+      'portrait'
+      'name'
+      'role'
+      'bio';
+    align-content: stretch;
+    padding: 1.75rem;
   }
 
-  .tile-accessory .geist-avatar {
-    width: 100% !important;
-    height: 100% !important;
+  .identity-portrait {
+    justify-self: start;
+    align-self: start;
+  }
+}
+
+/* Actions band: stacked rows on phones, three segments in one strip from md. */
+.hub-actions {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+}
+
+.hub-action {
+  transition:
+    transform 160ms var(--ease-out),
+    background-color 160ms var(--ease-out);
+}
+
+.hub-action + .hub-action {
+  border-top: 1px solid var(--ds-guide);
+}
+
+.hub-action:active {
+  transform: scale(0.98);
+  transition-duration: 100ms;
+}
+
+@media (min-width: 768px) {
+  .hub-actions {
+    flex-direction: row;
+    min-height: 4rem;
+  }
+
+  .hub-action {
+    padding-inline: 0.75rem;
+  }
+
+  .hub-action + .hub-action {
+    border-top: 0;
+    border-left: 1px solid var(--ds-guide);
+  }
+}
+
+/* Small desktops: the band is half of a 1000px grid, so labels need the glyph's room. */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .hub-action-glyph {
+    display: none;
+  }
+}
+
+@media (min-width: 1280px) {
+  .hub-action {
+    padding-inline: 1rem;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .hub-action:hover {
+    background-color: var(--ds-gray-100);
   }
 }
 

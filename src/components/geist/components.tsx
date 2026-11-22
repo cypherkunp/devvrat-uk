@@ -21,6 +21,8 @@ type GridSystemValue = {
 
 type CrossMark = { column: number; row: number }
 
+type SolidRect = { left: number; top: number; right: number; bottom: number }
+
 type GridValue = {
   columns: Breakpoint<number>
   rows: Breakpoint<number>
@@ -142,6 +144,7 @@ export function Grid({
     cols: [],
     rows: [],
   })
+  const [solids, setSolids] = useState<SolidRect[]>([])
 
   const registerAll = useCallback((next: CrossMark[]) => {
     setMarks(next)
@@ -167,6 +170,20 @@ export function Grid({
         cols: toLines(parseTracks(styles.gridTemplateColumns)),
         rows: toLines(parseTracks(styles.gridTemplateRows)),
       })
+      const origin = el.getBoundingClientRect()
+      setSolids(
+        [
+          ...el.querySelectorAll<HTMLElement>('.geist-grid-cell[data-solid]'),
+        ].map((cell) => {
+          const rect = cell.getBoundingClientRect()
+          return {
+            left: rect.left - origin.left,
+            top: rect.top - origin.top,
+            right: rect.right - origin.left,
+            bottom: rect.bottom - origin.top,
+          }
+        }),
+      )
     }
 
     measure()
@@ -203,8 +220,14 @@ export function Grid({
         hideGuides={hideGuides}
         dashed={system.dashedGuides}
         width={system.guideWidth}
+        solids={solids}
       />
-      <CrossLayer marks={marks} colLines={lines.cols} rowLines={lines.rows} />
+      <CrossLayer
+        marks={marks}
+        colLines={lines.cols}
+        rowLines={lines.rows}
+        solids={solids}
+      />
     </div>
   )
 }
@@ -269,18 +292,38 @@ export function GridCrosses(): null {
   return null
 }
 
+/**
+ * Pieces of a guide at `at` (running from 0 to `length`) that are not inside a
+ * solid cell, so spanning cells read as one surface instead of a crossed-out grid.
+ */
+function guideSegments(
+  length: number,
+  blockers: Array<[start: number, end: number]>,
+): Array<[start: number, end: number]> {
+  const segments: Array<[number, number]> = []
+  let cursor = 0
+  for (const [start, end] of [...blockers].sort((a, b) => a[0] - b[0])) {
+    if (start > cursor) segments.push([cursor, start])
+    cursor = Math.max(cursor, end)
+  }
+  if (cursor < length) segments.push([cursor, length])
+  return segments.filter(([start, end]) => end - start > 0.5)
+}
+
 function Guides({
   colLines,
   rowLines,
   hideGuides,
   dashed,
   width,
+  solids,
 }: {
   colLines: number[]
   rowLines: number[]
   hideGuides?: 'row' | 'column'
   dashed: boolean
   width: number
+  solids: SolidRect[]
 }): JSX.Element | null {
   if (!colLines.length || !rowLines.length) return null
   const height = colLines.length ? (rowLines.at(-1) ?? 0) : 0
@@ -292,33 +335,60 @@ function Guides({
     <div aria-hidden="true" className="geist-guides">
       {hideCols
         ? null
-        : colLines.map((x, index) => (
-            <span
-              key={`c${index}`}
-              className="geist-guide geist-guide-col"
-              data-dashed={dashed ? '' : undefined}
-              style={{
-                left: x,
-                width,
-                height,
-              }}
-            />
-          ))}
+        : colLines.flatMap((x, index) =>
+            guideSegments(
+              height,
+              solids
+                .filter((rect) => x > rect.left + 1 && x < rect.right - 1)
+                .map((rect) => [rect.top, rect.bottom]),
+            ).map(([top, bottom]) => (
+              <span
+                key={`c${index}:${top}`}
+                className="geist-guide geist-guide-col"
+                data-dashed={dashed ? '' : undefined}
+                style={{
+                  left: x,
+                  top,
+                  width,
+                  height: bottom - top,
+                }}
+              />
+            )),
+          )}
       {hideRows
         ? null
-        : rowLines.map((y, index) => (
-            <span
-              key={`r${index}`}
-              className="geist-guide geist-guide-row"
-              data-dashed={dashed ? '' : undefined}
-              style={{
-                top: y,
-                height: width,
-                width: span,
-              }}
-            />
-          ))}
+        : rowLines.flatMap((y, index) =>
+            guideSegments(
+              span,
+              solids
+                .filter((rect) => y > rect.top + 1 && y < rect.bottom - 1)
+                .map((rect) => [rect.left, rect.right]),
+            ).map(([left, right]) => (
+              <span
+                key={`r${index}:${left}`}
+                className="geist-guide geist-guide-row"
+                data-dashed={dashed ? '' : undefined}
+                style={{
+                  top: y,
+                  left,
+                  height: width,
+                  width: right - left,
+                }}
+              />
+            )),
+          )}
     </div>
+  )
+}
+
+/** A cross strictly inside a solid (spanning) cell would float over its content. */
+function insideSolid(x: number, y: number, solids: SolidRect[]): boolean {
+  return solids.some(
+    (rect) =>
+      x > rect.left + 1 &&
+      x < rect.right - 1 &&
+      y > rect.top + 1 &&
+      y < rect.bottom - 1,
   )
 }
 
@@ -326,10 +396,12 @@ function CrossLayer({
   marks,
   colLines,
   rowLines,
+  solids,
 }: {
   marks: CrossMark[]
   colLines: number[]
   rowLines: number[]
+  solids: SolidRect[]
 }): JSX.Element | null {
   if (!colLines.length || !rowLines.length) return null
   return (
@@ -340,6 +412,7 @@ function CrossLayer({
         }
         const x = colLines[mark.column - 1] ?? 0
         const y = rowLines[mark.row - 1] ?? 0
+        if (insideSolid(x, y, solids)) return null
         return (
           <span
             key={`${mark.column}:${mark.row}:${index}`}

@@ -22,11 +22,17 @@ import { useOsDark, useTransientMessage } from '#/components/link-hub/hooks'
 import { easeOut, springDefault } from '#/components/link-hub/motion'
 import { tileArt } from '#/components/link-hub/tile-art'
 import {
-  ButtonTile,
+  ActionButton,
+  ActionSwitch,
+  IdentityTile,
   LinkTile,
-  StaticTile,
-  SwitchTile,
 } from '#/components/link-hub/tiles'
+
+/** Two columns wide from md up; one column on phones. */
+const span2 = { md: 'span 2', lg: 'span 2' }
+/** Identity is pinned to the top-left 2×2 on desktop. */
+const identityColumn = { md: 'span 2', lg: '1 / span 2' }
+const identityRow = { lg: '1 / span 2' }
 
 export type LinkHubPageProps = {
   locale: Locale
@@ -83,24 +89,25 @@ export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
       >
         <GridPage>
           <GridSystem guideWidth={1} unstable_useContainer>
+            {/*
+              lg: Identity 2×2 | Portfolio 2-wide, then 6 Links, then a slim
+              band of Actions beside the footer. md/sm reflow in the same order.
+            */}
             <Grid
               className="hub-grid"
               columns={{ sm: 1, md: 2, lg: 4 }}
-              rows={{ sm: 16, md: 8, lg: 4 }}
+              rows={{ sm: 10, md: 7, lg: 4 }}
             >
               <GridCrosses />
 
               <main className="contents">
-                <section aria-label="Identity" className="contents">
-                  <GridCell>
-                    <StaticTile
-                      titleAs="h1"
-                      align="left"
-                      copy={{
-                        label: identity.role,
-                        title: identity.displayName,
-                      }}
-                      accessory={
+                <GridCell column={identityColumn} row={identityRow} solid>
+                  <section aria-label="Identity" className="h-full">
+                    <IdentityTile
+                      name={identity.displayName}
+                      role={identity.role}
+                      bio={identity.bio}
+                      portrait={
                         <Avatar
                           size={80}
                           src="/portrait.jpg"
@@ -108,22 +115,16 @@ export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
                         />
                       }
                     />
-                  </GridCell>
-                  <GridCell>
-                    <StaticTile
-                      showLabel={false}
-                      align="left"
-                      copy={{
-                        label: identity.bioLabel,
-                        title: identity.bio,
-                      }}
-                    />
-                  </GridCell>
-                </section>
+                  </section>
+                </GridCell>
 
                 <section aria-label="Links" className="contents">
                   {hubLinks.map((link) => (
-                    <GridCell key={link.id}>
+                    <GridCell
+                      key={link.id}
+                      column={link.highlighted ? span2 : undefined}
+                      solid={link.highlighted}
+                    >
                       <LinkTile
                         link={link}
                         copy={
@@ -145,9 +146,9 @@ export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
                   ))}
                 </section>
 
-                <section aria-label="Actions" className="contents">
-                  <GridCell>
-                    <ButtonTile
+                <GridCell column={span2} solid>
+                  <section aria-label="Actions" className="hub-actions">
+                    <ActionButton
                       art={tileArt[copyUrlActionId]}
                       copy={{
                         label: copyAction.label,
@@ -159,9 +160,7 @@ export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
                         void copyHubUrl()
                       }}
                     />
-                  </GridCell>
-                  <GridCell>
-                    <SwitchTile
+                    <ActionSwitch
                       art={tileArt[monoActionId]}
                       copy={{
                         label: monoAction.label,
@@ -170,9 +169,7 @@ export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
                       checked={monochrome}
                       onCheckedChange={toggleMonochrome}
                     />
-                  </GridCell>
-                  <GridCell>
-                    <SwitchTile
+                    <ActionSwitch
                       art={tileArt[darkActionId]}
                       copy={{
                         label: darkAction.label,
@@ -181,20 +178,11 @@ export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
                       checked={dark}
                       onCheckedChange={toggleDark}
                     />
-                  </GridCell>
-                </section>
+                  </section>
+                </GridCell>
               </main>
 
-              <GridCell>
-                <div className="h-full min-h-16" aria-hidden="true" />
-              </GridCell>
-              <GridCell>
-                <div className="h-full min-h-16" aria-hidden="true" />
-              </GridCell>
-              <GridCell>
-                <div className="h-full min-h-16" aria-hidden="true" />
-              </GridCell>
-              <GridCell>
+              <GridCell column={span2} solid>
                 <HubFooter
                   credit={locale.footer.credit}
                   rights={locale.footer.rights}
