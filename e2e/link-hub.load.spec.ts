@@ -43,10 +43,12 @@ test('Link Hub lists every outbound http Link', async ({ page }) => {
 test('Link Hub renders OG preview from the build snapshot without fetching destinations', async ({
   page,
 }) => {
+  const destinationHosts = new Set(
+    outboundHttpHrefs.map((href) => new URL(href).host),
+  )
   const destinationRequests: string[] = []
   page.on('request', (request) => {
-    if (request.resourceType() === 'image') return
-    if (outboundHttpHrefs.includes(request.url())) {
+    if (destinationHosts.has(new URL(request.url()).host)) {
       destinationRequests.push(request.url())
     }
   })
@@ -60,7 +62,15 @@ test('Link Hub renders OG preview from the build snapshot without fetching desti
   const preview = snapshot.projects
   await expect(projects).toContainText(preview.title)
   await expect(projects).toContainText(preview.description)
+  expect(preview.image).toMatch(/^\/og-previews\//)
   await expect(projects.locator('img')).toHaveAttribute('src', preview.image)
+  await expect
+    .poll(() =>
+      projects
+        .locator('img')
+        .evaluate((img: HTMLImageElement) => img.naturalWidth),
+    )
+    .toBeGreaterThan(0)
   await expect(projects.locator('img')).toHaveAttribute('alt', '')
   expect(destinationRequests).toEqual([])
 })

@@ -3,7 +3,7 @@
  * their Open Graph tags. Only the build script imports this; the page reads
  * the committed snapshot through `og-preview.ts`.
  */
-import type { ConfiguredLink } from '#/content/hub-config'
+import type { ConfiguredLink, LinkId } from '#/content/hub-config'
 import type { OgPreview, OgPreviews } from '#/content/og-preview'
 
 /**
@@ -15,7 +15,24 @@ export type OgFetcher = (
   init: { signal: AbortSignal; redirect: 'manual' },
 ) => Promise<Response>
 
+/** An OG image downloaded for the page to serve from `/og-previews/<name>`. */
+export type OgImageFile = { name: string; bytes: Uint8Array }
+
+export type OgSnapshot = { previews: OgPreviews; images: OgImageFile[] }
+
+/** Where downloaded OG images are served from, under `public/`. */
+export const ogImageDirectory = 'og-previews'
+
 const maxRedirects = 5
+
+/** Raster types only: an SVG served same-origin could carry script. */
+const imageExtensions: Partial<Record<string, string>> = {
+  'image/avif': 'avif',
+  'image/gif': 'gif',
+  'image/jpeg': 'jpg',
+  'image/png': 'png',
+  'image/webp': 'webp',
+}
 
 const namedEntities: Record<string, string> = {
   amp: '&',
@@ -151,15 +168,104 @@ function previewOf(
   return withinTimeout(timeoutMs, async (signal) => {
     const fetched = await fetchHttps(href, fetcher, signal)
     if (!fetched) return undefined
-    return parseOgPreview(await fetched.response.text(), fetched.url)
+    const preview = parseOgPreview(await fetched.response.text(), fetched.url)
+    return Object.keys(preview).length > 0 ? preview : undefined
   })
 }
 
+/** The body, unless it runs past `maxBytes` (declared or streamed) or is empty. */
+async function cappedBody(
+  response: Response,
+  maxBytes: number,
+): Promise<Uint8Array | undefined> {
+  if (Number(response.headers.get('content-length')) > maxBytes) {
+    return undefined
+  }
+  const reader = response.body?.getReader()
+  if (!reader) return undefined
+  const chunks: Uint8Array[] = []
+  let size = 0
+  for (;;) {
+    const { done, value } = await reader.read()
+    if (done) break
+    size += value.byteLength
+    if (size > maxBytes) {
+      await reader.cancel()
+      return undefined
+    }
+    chunks.push(value)
+  }
+  if (size === 0) return undefined
+  const bytes = new Uint8Array(size)
+  let offset = 0
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset)
+    offset += chunk.byteLength
+  }
+  return bytes
+}
+
+function imageOf(
+  id: LinkId,
+  href: string,
+  fetcher: OgFetcher,
+  { timeoutMs, maxImageBytes }: { timeoutMs: number; maxImageBytes: number },
+): Promise<OgImageFile | undefined> {
+  return withinTimeout(timeoutMs, async (signal) => {
+    const fetched = await fetchHttps(href, fetcher, signal)
+    if (!fetched) return undefined
+    const type = fetched.response.headers
+      .get('content-type')
+      ?.split(';')[0]
+      .trim()
+      .toLowerCase()
+    const extension = type ? imageExtensions[type] : undefined
+    if (!extension) return undefined
+    const bytes = await cappedBody(fetched.response, maxImageBytes)
+    return bytes && { name: `${id}.${extension}`, bytes }
+  })
+}
+
+function publicImagePath(image: OgImageFile): string {
+  return `/${ogImageDirectory}/${image.name}`
+}
+
+/** `path` if it is this Link's own downloaded image; never a remote URL. */
+function localImage(id: LinkId, path: string | undefined): string | undefined {
+  return path?.startsWith(`/${ogImageDirectory}/${id}.`) ? path : undefined
+}
+
+async function snapshotEntry(
+  link: ConfiguredLink,
+  fetcher: OgFetcher,
+  last: OgPreview | undefined,
+  limits: { timeoutMs: number; maxImageBytes: number },
+): Promise<{ preview?: OgPreview; image?: OgImageFile }> {
+  const fresh = await previewOf(link.href, fetcher, limits.timeoutMs)
+  if (!fresh) {
+    return {
+      preview:
+        last &&
+        withoutEmptyFields({ ...last, image: localImage(link.id, last.image) }),
+    }
+  }
+
+  const { image: remote, ...text } = fresh
+  const image = remote
+    ? await imageOf(link.id, remote, fetcher, limits)
+    : undefined
+  const path = image
+    ? publicImagePath(image)
+    : remote && localImage(link.id, last?.image)
+  return { preview: withoutEmptyFields({ ...text, image: path }), image }
+}
+
 /**
- * The OG preview snapshot: one entry for every https Link that opts in, and
- * none for any other Link. This is the only place the opt-in is read. Never
- * throws: a failed, slow, or empty destination keeps its `previous` entry, or
- * has none.
+ * The OG preview snapshot: an entry for every https Link that opts in, and
+ * none for any other Link. This is the only place the opt-in is read. Each
+ * og:image is downloaded (https, raster, at most `maxImageBytes`) so the page
+ * serves it same-origin. Never throws: a failed, slow, or empty destination
+ * keeps its `previous` entry, and a failed image keeps its last local copy.
  */
 export async function resolveOgPreviews(
   links: ConfiguredLink[],
@@ -167,24 +273,30 @@ export async function resolveOgPreviews(
   {
     previous = {},
     timeoutMs = 5000,
-  }: { previous?: OgPreviews; timeoutMs?: number } = {},
-): Promise<OgPreviews> {
+    maxImageBytes = 1_000_000,
+  }: { previous?: OgPreviews; timeoutMs?: number; maxImageBytes?: number } = {},
+): Promise<OgSnapshot> {
   const candidates = links.filter(
     (link) => link.ogPreview && link.href.startsWith('https://'),
   )
-  const resolved = await Promise.all(
+  const entries = await Promise.all(
     candidates.map(
       async (link) =>
-        [link.id, await previewOf(link.href, fetcher, timeoutMs)] as const,
+        [
+          link.id,
+          await snapshotEntry(link, fetcher, previous[link.id], {
+            timeoutMs,
+            maxImageBytes,
+          }),
+        ] as const,
     ),
   )
 
-  const previews: OgPreviews = {}
-  for (const [id, preview] of resolved) {
-    const fresh =
-      preview && Object.keys(preview).length > 0 ? preview : undefined
-    const kept = fresh ?? previous[id]
-    if (kept) previews[id] = kept
+  const snapshot: OgSnapshot = { previews: {}, images: [] }
+  for (const [id, { preview, image }] of entries) {
+    if (preview && Object.keys(preview).length > 0)
+      snapshot.previews[id] = preview
+    if (image) snapshot.images.push(image)
   }
-  return previews
+  return snapshot
 }

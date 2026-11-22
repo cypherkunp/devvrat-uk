@@ -96,7 +96,8 @@ function TileCaption({
 }
 
 /**
- * OG preview image at the OG card ratio (1.91:1). Decorative, since the title
+ * OG preview image at the OG card ratio (1.91:1), served same-origin from the
+ * build-time download. Decorative, since the title
  * already names the Link; sized up front and lazy. Trails the caption on
  * narrow tiles and sits above it on desktop, where tiles have spare height.
  */
@@ -109,7 +110,6 @@ function TilePreviewImage({ src }: { src: string }) {
       height={64}
       loading="lazy"
       decoding="async"
-      referrerPolicy="no-referrer"
       className="h-10 w-[76px] shrink-0 rounded-[6px] object-cover max-md:ml-auto lg:order-first lg:h-16 lg:w-[122px]"
     />
   )

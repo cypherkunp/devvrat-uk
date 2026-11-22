@@ -256,7 +256,7 @@ describe('Link Hub page', () => {
   })
 
   it('shows the OG preview on the opted-in Projects tile', () => {
-    const image = 'https://avatars.githubusercontent.com/u/1?v=4'
+    const image = '/og-previews/projects.png'
     renderPage({
       projects: {
         title: 'Devvrat · Projects',
