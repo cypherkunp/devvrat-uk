@@ -2,6 +2,9 @@
   "name": "devvrat-uk",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=22.18.0"
+  },
   "imports": {
     "#/*": "./src/*"
   },
@@ -9,7 +12,7 @@
     "dev": "vite dev --port 3000",
     "generate-routes": "tsr generate",
     "og-previews": "node scripts/resolve-og-previews.ts",
-    "build": "pnpm og-previews && vite build",
+    "build": "(pnpm og-previews || true) && vite build",
     "preview": "vite preview",
     "test": "vitest run --pool=forks",
     "test:e2e": "playwright test",
