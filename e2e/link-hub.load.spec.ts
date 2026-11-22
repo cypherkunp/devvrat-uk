@@ -36,6 +36,7 @@ test('Link Hub lists every outbound http Link', async ({ page }) => {
     )
 
   expect(hrefs).toEqual([...outboundHttpHrefs].sort())
+  expect(hrefs).toContain('https://cypherkunp.github.io/')
 })
 
 for (const href of outboundHttpHrefs) {

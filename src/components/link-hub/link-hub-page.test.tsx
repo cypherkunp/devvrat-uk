@@ -88,7 +88,7 @@ describe('Link Hub page', () => {
     expect(footer.closest('main')).toBeNull()
   })
 
-  it('routes configured Links with Portfolio, hire, then Handbook first', () => {
+  it('routes configured Links with Portfolio, hire, Handbook, then Projects first', () => {
     const { locale } = renderPage()
 
     expect(document.querySelector('a[href^="mailto:"]')).toBeNull()
@@ -120,6 +120,9 @@ describe('Link Hub page', () => {
     const photos = screen.getByRole('link', {
       name: linkName(locale.links.photos),
     })
+    const projects = screen.getByRole('link', {
+      name: 'Projects (cypherkunp.github.io)',
+    })
 
     expect(resume.getAttribute('href')).toBe('https://www.devvrat.cc/about')
     expect(portfolio.getAttribute('href')).toBe('https://devvrat.cc')
@@ -133,6 +136,7 @@ describe('Link Hub page', () => {
       'https://www.devvrat.cc/posts/handbook',
     )
     expect(photos.getAttribute('href')).toBe('https://www.devvrat.cc/photos')
+    expect(projects.getAttribute('href')).toBe('https://cypherkunp.github.io/')
 
     expect(
       screen.getAllByRole('link').map((link) => link.getAttribute('href')),
@@ -140,6 +144,7 @@ describe('Link Hub page', () => {
       portfolio.getAttribute('href'),
       resume.getAttribute('href'),
       handbook.getAttribute('href'),
+      projects.getAttribute('href'),
       linkedin.getAttribute('href'),
       github.getAttribute('href'),
       twitter.getAttribute('href'),
@@ -229,6 +234,19 @@ describe('Link Hub page', () => {
     expect(analytics.events).toContainEqual({
       type: 'link_click',
       linkId: 'github',
+    })
+  })
+
+  it('records link_click for the Projects Link', () => {
+    const { analytics } = renderPage()
+
+    fireEvent.click(
+      screen.getByRole('link', { name: 'Projects (cypherkunp.github.io)' }),
+    )
+
+    expect(analytics.events).toContainEqual({
+      type: 'link_click',
+      linkId: 'projects',
     })
   })
 

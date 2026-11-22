@@ -33,6 +33,7 @@ export type Locale = {
     handbook: LinkCopy
     photos: LinkCopy
     resume: LinkCopy
+    projects: LinkCopy
   }
   actions: {
     'copy-url': ActionCopy

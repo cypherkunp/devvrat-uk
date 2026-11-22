@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import type { Icon } from '@phosphor-icons/react/dist/lib/types'
 import { BookOpenIcon } from '@phosphor-icons/react/dist/ssr/BookOpen'
 import { BriefcaseIcon } from '@phosphor-icons/react/dist/ssr/Briefcase'
+import { CodeIcon } from '@phosphor-icons/react/dist/ssr/Code'
 import { CircleHalfIcon } from '@phosphor-icons/react/dist/ssr/CircleHalf'
 import { GithubLogoIcon } from '@phosphor-icons/react/dist/ssr/GithubLogo'
 import { GlobeSimpleIcon } from '@phosphor-icons/react/dist/ssr/GlobeSimple'
@@ -54,6 +55,10 @@ export const tileArt: Record<LinkId | ActionId, TileArt> = {
   handbook: {
     accent: '#bf4800',
     glyph: mark(BookOpenIcon),
+  },
+  projects: {
+    accent: '#5e5ce6',
+    glyph: mark(CodeIcon),
   },
   photos: {
     accent: '#bf5af2',

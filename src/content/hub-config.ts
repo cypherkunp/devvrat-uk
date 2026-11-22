@@ -6,6 +6,7 @@ export type LinkId =
   | 'handbook'
   | 'photos'
   | 'resume'
+  | 'projects'
 
 export type ConfiguredLink = {
   id: LinkId
@@ -42,6 +43,7 @@ export const hubLinks: HubLink[] = [
   { id: 'central-hub', href: 'https://devvrat.cc', highlighted: true },
   { id: 'resume', href: resumeHref },
   { id: 'handbook', href: 'https://www.devvrat.cc/posts/handbook' },
+  { id: 'projects', href: 'https://cypherkunp.github.io/' },
   { id: 'linkedin', href: 'https://www.linkedin.com/in/devvratshukla' },
   { id: 'github', href: 'https://github.com/cypherkunp' },
   { id: 'twitter', href: 'https://x.com/devvrathq' },

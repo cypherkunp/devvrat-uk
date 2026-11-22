@@ -18,14 +18,16 @@ _Avoid_: Profile block, about section, hero (as a product term); ACTIVE / AVAILA
 
 **Link**:
 An outbound destination shown as a tile on the Link Hub (label, title, optional handle, destination URL). Launch set:
+
 - Portfolio Site → `https://devvrat.cc`
 - Availability → `https://www.devvrat.cc/about`
 - Handbook → `https://www.devvrat.cc/posts/handbook`
+- Projects → `https://cypherkunp.github.io/`
 - LinkedIn → `https://www.linkedin.com/in/devvratshukla`
 - GitHub → `https://github.com/cypherkunp`
 - Twitter → `https://x.com/devvrathq`
 - Photography → `https://www.devvrat.cc/photos`
-_Avoid_: Card, button, social (as the noun for one entry)
+  _Avoid_: Card, button, social (as the noun for one entry)
 
 **Action**:
 An on-page control on the Link Hub that is not a Link. Launch Actions: Copy URL (clipboard), Mono (grayscale Display switch), and Dark (scheme switch). Dark defaults to the visitor's OS color scheme; a flip lasts this Visit only. Mono and Dark are independent (all four light/dark × color/mono combinations are valid).

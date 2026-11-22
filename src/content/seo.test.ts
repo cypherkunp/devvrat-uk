@@ -86,6 +86,7 @@ describe('Owner Identity markup', () => {
     expect(ownerSameAsUrls()).toEqual([
       'https://devvrat.cc',
       resumeHref,
+      'https://cypherkunp.github.io/',
       'https://www.linkedin.com/in/devvratshukla',
       'https://github.com/cypherkunp',
       'https://x.com/devvrathq',

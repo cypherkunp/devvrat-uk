@@ -96,13 +96,13 @@ export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
         <GridPage>
           <GridSystem guideWidth={1} unstable_useContainer>
             {/*
-              lg: Identity 2×2 | Portfolio 2-wide, then 6 Links, then a slim
-              band of Actions beside the footer. md/sm reflow in the same order.
+              lg: Identity 2×2 | 8 Links (Portfolio first), then a slim band of
+              Actions beside the footer. md/sm reflow in the same order.
             */}
             <Grid
               className="hub-grid"
               columns={{ sm: 1, md: 2, lg: 4 }}
-              rows={{ sm: 10, md: 7, lg: 4 }}
+              rows={{ sm: 11, md: 7, lg: 4 }}
             >
               <GridCrosses />
 
@@ -126,11 +126,7 @@ export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
 
                 <section aria-label="Links" className="contents">
                   {hubLinks.map((link) => (
-                    <GridCell
-                      key={link.id}
-                      column={link.highlighted ? span2 : undefined}
-                      solid={link.highlighted}
-                    >
+                    <GridCell key={link.id} solid={link.highlighted}>
                       <LinkTile
                         link={link}
                         copy={

@@ -42,6 +42,11 @@
       "label": "Availability",
       "title": "Available for Hire",
       "handle": "devvrat.cc/about"
+    },
+    "projects": {
+      "label": "Projects",
+      "title": "Projects",
+      "handle": "cypherkunp.github.io"
     }
   },
   "actions": {
