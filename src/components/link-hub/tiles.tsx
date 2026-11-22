@@ -9,15 +9,22 @@ import { tileArt } from '#/components/link-hub/tile-art'
 import type { TileArt } from '#/components/link-hub/tile-art'
 
 /** Interactive surface — hover/press are CSS so they stay compositor-friendly. */
-export function tileClass(
+export function tileClass({
   staticTile = false,
-  align: 'left' | 'center' = 'left',
-) {
+  align = 'left',
+  stackOnDesktop = false,
+}: {
+  staticTile?: boolean
+  align?: 'left' | 'center'
+  /** Stack the content on desktop, e.g. an OG preview image above the caption. */
+  stackOnDesktop?: boolean
+} = {}) {
   return [
     'tile group relative isolate flex h-full w-full px-4 py-7',
     staticTile
       ? 'min-h-24 flex-col'
       : 'min-h-16 flex-row items-center gap-3 md:justify-center',
+    stackOnDesktop && !staticTile ? 'lg:flex-col' : '',
     align === 'center'
       ? 'items-start justify-center gap-3 text-left md:items-center md:text-center'
       : staticTile
@@ -208,7 +215,7 @@ export function LinkTile({
       {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
       aria-label={controlLabel(copy)}
       data-highlighted={link.highlighted ? 'true' : undefined}
-      className={`${tileClass()}${copy.image ? ' lg:flex-col' : ''}`}
+      className={tileClass({ stackOnDesktop: Boolean(copy.image) })}
       onClick={onActivate}
     >
       <TileRow>

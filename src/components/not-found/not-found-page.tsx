@@ -44,14 +44,16 @@ export function NotFoundPage({
 
             <main className="not-found-main md:contents">
               <GridCell>
-                <div className={tileClass(true, 'center')}>
+                <div
+                  className={tileClass({ staticTile: true, align: 'center' })}
+                >
                   <h1 className="display-title min-w-0 text-7xl leading-none text-[var(--hub-fg)] md:text-8xl lg:text-9xl">
                     {locale.notFound.code}
                   </h1>
                 </div>
               </GridCell>
               <GridCell>
-                <div className={tileClass(true, 'left')}>
+                <div className={tileClass({ staticTile: true })}>
                   <p className="text-copy-16 min-w-0 wrap-break-word text-[var(--hub-fg)]">
                     {locale.notFound.heading}
                   </p>
