@@ -12,6 +12,7 @@
     "dev": "vite dev --port 3000",
     "generate-routes": "tsr generate",
     "og-previews": "node scripts/resolve-og-previews.ts",
+    "og-image": "node scripts/render-og-image.ts",
     "build": "(pnpm og-previews || true) && vite build",
     "preview": "vite preview",
     "test": "vitest run --pool=forks",

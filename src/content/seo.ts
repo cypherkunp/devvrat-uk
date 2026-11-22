@@ -61,18 +61,20 @@ export function linkHubJsonLd(
 
 export function linkHubHead(locale: Locale, origin = hubOrigin) {
   const url = `${origin}/`
-  const shareImage = `${origin}/og.jpg`
-  const { documentTitle, description } = locale.meta
+  const shareImage = `${origin}/og-image.jpg`
+  const { documentTitle, description, shareImageAlt } = locale.meta
 
   return {
     meta: [
       { name: 'description', content: description },
+      { name: 'robots', content: 'index, follow, max-image-preview:large' },
       { property: 'og:type', content: 'profile' },
       { property: 'og:url', content: url },
       { property: 'og:title', content: documentTitle },
       { property: 'og:description', content: description },
       { property: 'og:image', content: shareImage },
-      { property: 'og:image:alt', content: locale.identity.portraitAlt },
+      { property: 'og:image:alt', content: shareImageAlt },
+      { property: 'og:image:type', content: 'image/jpeg' },
       { property: 'og:image:width', content: '1200' },
       { property: 'og:image:height', content: '630' },
       { property: 'og:site_name', content: 'Devvrat' },
@@ -84,7 +86,7 @@ export function linkHubHead(locale: Locale, origin = hubOrigin) {
       { name: 'twitter:title', content: documentTitle },
       { name: 'twitter:description', content: description },
       { name: 'twitter:image', content: shareImage },
-      { name: 'twitter:image:alt', content: locale.identity.portraitAlt },
+      { name: 'twitter:image:alt', content: shareImageAlt },
     ],
     links: [{ rel: 'canonical', href: url }],
     scripts: [

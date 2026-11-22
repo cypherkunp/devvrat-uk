@@ -59,7 +59,10 @@ export type Locale = {
   }
   meta: {
     documentTitle: string
+    /** 110-160 characters: the range search results and link unfurls show in full. */
     description: string
+    /** Alt text for the share image, which carries text the portrait alt does not. */
+    shareImageAlt: string
   }
 }
 

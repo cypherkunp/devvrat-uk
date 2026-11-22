@@ -133,6 +133,25 @@ describe('Owner Identity markup', () => {
     expect(person).not.toHaveProperty('email')
   })
 
+  it('keeps the description in the 110-160 character range search results show', () => {
+    expect(locale.meta.description.length).toBeGreaterThanOrEqual(110)
+    expect(locale.meta.description.length).toBeLessThanOrEqual(160)
+  })
+
+  it('serves a 1200x630 share image from public/', () => {
+    const image = readFileSync('public/og-image.jpg')
+    // JPEG: find the SOF0/SOF2 marker, which holds height then width.
+    let offset = 2
+    while (offset < image.length) {
+      const marker = image[offset + 1]
+      if (marker === 0xc0 || marker === 0xc2) break
+      offset += 2 + image.readUInt16BE(offset + 2)
+    }
+
+    expect(image.readUInt16BE(offset + 5)).toBe(630)
+    expect(image.readUInt16BE(offset + 7)).toBe(1200)
+  })
+
   it('exposes description, canonical, and share tags for the homepage', () => {
     const head = linkHubHead(locale)
 
@@ -150,11 +169,11 @@ describe('Owner Identity markup', () => {
     })
     expect(head.meta).toContainEqual({
       property: 'og:image',
-      content: `${hubOrigin}/og.jpg`,
+      content: `${hubOrigin}/og-image.jpg`,
     })
     expect(head.meta).toContainEqual({
       property: 'og:image:alt',
-      content: locale.identity.portraitAlt,
+      content: locale.meta.shareImageAlt,
     })
     expect(head.meta).toContainEqual({
       property: 'og:image:width',
@@ -179,11 +198,11 @@ describe('Owner Identity markup', () => {
     expect(locale.links.twitter.handle).toBe('@devvrathq')
     expect(head.meta).toContainEqual({
       name: 'twitter:image',
-      content: `${hubOrigin}/og.jpg`,
+      content: `${hubOrigin}/og-image.jpg`,
     })
     expect(head.meta).toContainEqual({
       name: 'twitter:image:alt',
-      content: locale.identity.portraitAlt,
+      content: locale.meta.shareImageAlt,
     })
     expect(head.meta).toContainEqual({
       property: 'profile:first_name',

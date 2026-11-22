@@ -1,0 +1,212 @@
+<!doctype html>
+<!--
+  Source for public/og-image.jpg, the Link Hub's share image (1200x630).
+  Render it with `pnpm og-image`; copy here must match en.json.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Devvrat | OG image</title>
+    <style>
+      @font-face {
+        font-family: 'Geist Sans';
+        src: url('../node_modules/geist/dist/fonts/geist-sans/Geist-Variable.woff2')
+          format('woff2');
+        font-weight: 100 900;
+      }
+      @font-face {
+        font-family: 'Geist Mono';
+        src: url('../node_modules/geist/dist/fonts/geist-mono/GeistMono-Variable.woff2')
+          format('woff2');
+        font-weight: 100 900;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+      }
+
+      :root {
+        --bg: #ffffff;
+        --fg: #171717;
+        --muted: #666666;
+        --guide: #e5e5e5;
+        --accent: #0072f5;
+        --ok: #1a8f3f;
+      }
+
+      body {
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+        background: var(--bg);
+        color: var(--fg);
+        font-family: 'Geist Sans', system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .card {
+        position: relative;
+        display: grid;
+        grid-template-columns: 1fr 560px;
+        width: 100%;
+        height: 100%;
+      }
+
+      /* Hairline guides with crosses at the corners, as on the Link Hub. */
+      .guide {
+        position: absolute;
+        background: var(--guide);
+      }
+      .guide--top {
+        top: 56px;
+        left: 0;
+        width: 640px;
+        height: 1px;
+      }
+      .guide--bottom {
+        bottom: 56px;
+        left: 0;
+        width: 640px;
+        height: 1px;
+      }
+      .guide--left {
+        top: 0;
+        left: 64px;
+        width: 1px;
+        height: 100%;
+      }
+      .cross {
+        position: absolute;
+        width: 13px;
+        height: 13px;
+        color: var(--muted);
+      }
+      .cross::before,
+      .cross::after {
+        content: '';
+        position: absolute;
+        background: currentColor;
+      }
+      .cross::before {
+        left: 6px;
+        top: 0;
+        width: 1px;
+        height: 13px;
+      }
+      .cross::after {
+        left: 0;
+        top: 6px;
+        width: 13px;
+        height: 1px;
+      }
+      .cross--top {
+        top: 50px;
+        left: 58px;
+      }
+      .cross--bottom {
+        bottom: 50px;
+        left: 58px;
+      }
+
+      .copy {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 56px 40px 56px 112px;
+      }
+
+      .badge {
+        align-self: flex-start;
+        margin-top: 36px;
+        padding: 9px 16px;
+        border: 1px solid var(--guide);
+        border-radius: 999px;
+        font-family: 'Geist Mono', ui-monospace, monospace;
+        font-size: 17px;
+        font-weight: 500;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      h1 {
+        font-size: 132px;
+        font-weight: 650;
+        line-height: 0.95;
+        letter-spacing: -0.055em;
+      }
+
+      .tagline {
+        margin-top: 24px;
+        max-width: 460px;
+        text-wrap: balance;
+        font-size: 30px;
+        line-height: 1.3;
+        letter-spacing: -0.01em;
+        color: var(--muted);
+      }
+
+      .foot {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 36px;
+        font-family: 'Geist Mono', ui-monospace, monospace;
+        font-size: 20px;
+        font-weight: 500;
+      }
+      .status {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: var(--ok);
+      }
+      .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--ok);
+        box-shadow: 0 0 0 5px rgb(26 143 63 / 0.16);
+      }
+      .host {
+        color: var(--accent);
+      }
+
+      .portrait {
+        width: 560px;
+        height: 630px;
+        object-fit: cover;
+        object-position: 50% 30%;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <span class="guide guide--top"></span>
+      <span class="guide guide--bottom"></span>
+      <span class="guide guide--left"></span>
+      <span class="cross cross--top"></span>
+      <span class="cross cross--bottom"></span>
+
+      <div class="copy">
+        <p class="badge">AI Sorcerer | Engineer | Craftsman</p>
+        <div>
+          <h1>Devvrat</h1>
+          <p class="tagline">
+            Crafting digital experiences and building high-performance teams.
+          </p>
+        </div>
+        <div class="foot">
+          <span class="status"
+            ><span class="dot"></span>Available for Hire</span
+          >
+          <span class="host">devvrat.uk</span>
+        </div>
+      </div>
+
+      <img class="portrait" src="../public/portrait.jpg" alt="" />
+    </div>
+  </body>
+</html>
