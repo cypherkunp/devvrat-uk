@@ -12,10 +12,9 @@ import type { OgPreviews } from '../src/content/og-preview.ts'
 
 const snapshotUrl = new URL('../src/content/og-previews.json', import.meta.url)
 
-const fetcher: OgFetcher = (url, { signal }) =>
+const fetcher: OgFetcher = (url, init) =>
   fetch(url, {
-    signal,
-    redirect: 'follow',
+    ...init,
     headers: {
       accept: 'text/html,application/xhtml+xml;q=0.9,*/*;q=0.8',
       'user-agent': 'Mozilla/5.0 (compatible; og-preview-build)',

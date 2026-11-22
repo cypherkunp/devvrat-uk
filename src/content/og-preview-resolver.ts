@@ -6,11 +6,16 @@
 import type { ConfiguredLink } from '#/content/hub-config'
 import type { OgPreview, OgPreviews } from '#/content/og-preview'
 
-/** `fetch`-shaped, so tests pass canned HTML and the build passes `fetch`. */
+/**
+ * `fetch`-shaped, so tests pass canned responses and the build passes `fetch`.
+ * The resolver follows redirects itself, so it can refuse any that leave https.
+ */
 export type OgFetcher = (
   url: string,
-  init: { signal: AbortSignal },
+  init: { signal: AbortSignal; redirect: 'manual' },
 ) => Promise<Response>
+
+const maxRedirects = 5
 
 const namedEntities: Record<string, string> = {
   amp: '&',
@@ -83,11 +88,41 @@ function parseOgPreview(html: string, pageUrl: string): OgPreview {
   })
 }
 
-async function previewOf(
+type Fetched = { response: Response; url: string }
+
+/**
+ * A successful response for `href`, reached through at most `maxRedirects`
+ * redirects, every one of them https. Anything else is no response.
+ */
+async function fetchHttps(
   href: string,
   fetcher: OgFetcher,
+  signal: AbortSignal,
+): Promise<Fetched | undefined> {
+  let url = httpsUrl(href, href)
+  for (let hop = 0; url && hop <= maxRedirects; hop++) {
+    const response = await fetcher(url, { signal, redirect: 'manual' })
+    const location = response.headers.get('location')
+    if (response.status >= 300 && response.status < 400 && location) {
+      url = httpsUrl(location, url)
+      continue
+    }
+    if (!response.ok) return undefined
+    // A fetcher that followed redirects anyway must still have stayed on https.
+    if (response.url && !httpsUrl(response.url, url)) return undefined
+    return { response, url: response.url || url }
+  }
+  return undefined
+}
+
+/**
+ * Runs `task` with an abort signal, giving `undefined` once `timeoutMs`
+ * passes or if the task throws. A task that ignores the signal still loses.
+ */
+async function withinTimeout<T>(
   timeoutMs: number,
-): Promise<OgPreview | undefined> {
+  task: (signal: AbortSignal) => Promise<T | undefined>,
+): Promise<T | undefined> {
   const controller = new AbortController()
   let timer: ReturnType<typeof setTimeout> | undefined
   const timedOut = new Promise<undefined>((resolve) => {
@@ -96,21 +131,28 @@ async function previewOf(
       resolve(undefined)
     }, timeoutMs)
   })
-  const fetched = (async () => {
-    const response = await fetcher(href, { signal: controller.signal })
-    if (!response.ok) return undefined
-    return parseOgPreview(await response.text(), response.url || href)
-  })()
+  const running = task(controller.signal)
 
   try {
-    // A fetcher that ignores the signal still loses the race.
-    return await Promise.race([fetched, timedOut])
+    return await Promise.race([running, timedOut])
   } catch {
     return undefined
   } finally {
     clearTimeout(timer)
-    fetched.catch(() => {})
+    running.catch(() => {})
   }
+}
+
+function previewOf(
+  href: string,
+  fetcher: OgFetcher,
+  timeoutMs: number,
+): Promise<OgPreview | undefined> {
+  return withinTimeout(timeoutMs, async (signal) => {
+    const fetched = await fetchHttps(href, fetcher, signal)
+    if (!fetched) return undefined
+    return parseOgPreview(await fetched.response.text(), fetched.url)
+  })
 }
 
 /**

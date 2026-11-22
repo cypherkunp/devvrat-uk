@@ -132,3 +132,59 @@ describe('OG preview resolution', () => {
     ).toEqual({ projects: { title: 'Last known' } })
   })
 })
+
+describe('OG preview redirects', () => {
+  function redirect(location: string) {
+    return new Response(null, { status: 301, headers: { location } })
+  }
+
+  it('follows https redirects and asks the fetcher not to follow them itself', async () => {
+    const requested: string[] = []
+    const fetcher: OgFetcher = async (url, init) => {
+      requested.push(`${init.redirect} ${url}`)
+      if (url === projects.href) return redirect('/home')
+      return new Response('<title>Home</title>')
+    }
+
+    expect(await resolveOgPreviews([projects], fetcher)).toEqual({
+      projects: { title: 'Home' },
+    })
+    expect(requested).toEqual([
+      'manual https://cypherkunp.github.io/',
+      'manual https://cypherkunp.github.io/home',
+    ])
+  })
+
+  it('gives no preview when a redirect leaves https', async () => {
+    const requested: string[] = []
+    const fetcher: OgFetcher = async (url) => {
+      requested.push(url)
+      return url === projects.href
+        ? redirect('http://cypherkunp.github.io/')
+        : new Response('<title>Insecure</title>')
+    }
+
+    expect(await resolveOgPreviews([projects], fetcher)).toEqual({})
+    expect(requested).toEqual([projects.href])
+  })
+
+  it('gives no preview after too many redirects', async () => {
+    let hops = 0
+    const fetcher: OgFetcher = async () => redirect(`/hop-${++hops}`)
+
+    expect(await resolveOgPreviews([projects], fetcher)).toEqual({})
+    expect(hops).toBeLessThanOrEqual(6)
+  })
+
+  it('gives no preview when the fetcher ends up off https anyway', async () => {
+    const fetcher: OgFetcher = async () => {
+      const response = new Response('<title>Followed</title>')
+      Object.defineProperty(response, 'url', {
+        value: 'http://cypherkunp.github.io/',
+      })
+      return response
+    }
+
+    expect(await resolveOgPreviews([projects], fetcher)).toEqual({})
+  })
+})
