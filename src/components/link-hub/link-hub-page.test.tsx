@@ -166,6 +166,30 @@ describe('Link Hub page', () => {
     expect(await screen.findByText(action.success)).toBeTruthy()
   })
 
+  it('says when the clipboard refuses and shows the URL to copy by hand', async () => {
+    const writeText = vi.fn().mockRejectedValue(new Error('denied'))
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText },
+    })
+
+    const { locale, analytics } = renderPage()
+    const action = locale.actions['copy-url']
+
+    fireEvent.click(
+      screen.getByRole('button', { name: `${action.label}: ${action.title}` }),
+    )
+
+    expect(
+      await screen.findByText(action.failure.replace('{url}', 'devvrat.uk')),
+    ).toBeTruthy()
+    expect(screen.queryByText(action.success)).toBeNull()
+    expect(analytics.events).not.toContainEqual({
+      type: 'action_click',
+      actionId: 'copy-url',
+    })
+  })
+
   it('exposes labelled keyboard-operable Links and Action', () => {
     const { locale } = renderPage()
 

@@ -17,7 +17,7 @@ export type TileArt = {
   glyph: ReactNode
   /** Accent for the glyph. */
   accent: string
-  /** Chip fill. Defaults to a tint of `accent` on gray-200. */
+  /** Chip fill. Defaults to a 30% tint of `accent` on gray-200. */
   chip?: string
 }
 
@@ -26,7 +26,7 @@ function mark(Icon: Icon) {
 }
 
 /** Mid gray so near-black/white glyphs don't wash the chip in dark mode. */
-const grayChip = 'color-mix(in srgb, #6e6e73 22%, var(--ds-gray-200))'
+const grayChip = 'color-mix(in srgb, #6e6e73 30%, var(--ds-gray-200))'
 
 export const tileArt: Record<LinkId | ActionId, TileArt> = {
   resume: {

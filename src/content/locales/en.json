@@ -48,7 +48,8 @@
     "copy-url": {
       "label": "Copy URL",
       "title": "Share this hub",
-      "success": "Copied to clipboard"
+      "success": "Copied to clipboard",
+      "failure": "Copy failed: {url}"
     },
     "mono": {
       "label": "Display",

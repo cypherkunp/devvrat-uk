@@ -45,7 +45,7 @@ function TileChip({ art, filled = false }: { art: TileArt; filled?: boolean }) {
         backgroundColor: filled
           ? art.accent
           : (art.chip ??
-            `color-mix(in srgb, ${art.accent} 22%, var(--ds-gray-200))`),
+            `color-mix(in srgb, ${art.accent} 30%, var(--ds-gray-200))`),
       }}
     >
       {art.glyph}
@@ -76,17 +76,14 @@ function TileCaption({ title, handle }: Omit<LinkCopy, 'label'>) {
   )
 }
 
-export type Tone = 'pending' | 'ok'
+export type Tone = 'ok' | 'error'
 
-const toneClass: Record<Tone, string> = {
-  pending: 'geist-badge',
-  ok: 'geist-badge',
-}
+/** Feedback an Action shows for a beat in place of its caption. */
+export type ActionMessage = { text: string; tone: Tone }
 
 function StatusMessage({ children, tone }: { children: string; tone: Tone }) {
   return (
     <motion.span
-      role="status"
       initial={{
         opacity: 0,
         filter: 'blur(2px)',
@@ -104,8 +101,8 @@ function StatusMessage({ children, tone }: { children: string; tone: Tone }) {
         transform: 'translateY(4px)',
         transition: feedbackExit,
       }}
-      className={toneClass[tone]}
-      data-variant={tone === 'pending' ? 'amber' : 'green'}
+      className="geist-badge justify-self-start"
+      data-variant={tone === 'error' ? 'amber' : 'green'}
     >
       {children}
     </motion.span>
@@ -216,13 +213,11 @@ export function ActionButton({
   art,
   copy,
   message,
-  tone,
   onActivate,
 }: {
   art: TileArt
   copy: LinkCopy
-  message: string | null
-  tone: Tone
+  message: ActionMessage | null
   onActivate: () => void
 }) {
   return (
@@ -233,17 +228,24 @@ export function ActionButton({
       onClick={onActivate}
     >
       <ActionGlyph art={art} />
-      {/* One grid cell: caption and status cross-fade in place, the row never grows. */}
+      {/*
+        One grid cell: caption and status cross-fade in place, so the row never
+        grows. The status region is always mounted so screen readers hear the
+        message when it arrives, not only when the region itself appears.
+      */}
       <span className="grid min-w-0 items-center [&>*]:[grid-area:1/1]">
         <AnimatePresence initial={false}>
-          {message ? (
-            <StatusMessage key="status" tone={tone}>
-              {message}
-            </StatusMessage>
-          ) : (
-            <CaptionBody key="caption" title={copy.title} />
-          )}
+          {message ? null : <CaptionBody key="caption" title={copy.title} />}
         </AnimatePresence>
+        <span role="status" className="grid min-w-0 items-center">
+          <AnimatePresence initial={false}>
+            {message ? (
+              <StatusMessage key={message.tone} tone={message.tone}>
+                {message.text}
+              </StatusMessage>
+            ) : null}
+          </AnimatePresence>
+        </span>
       </span>
     </button>
   )

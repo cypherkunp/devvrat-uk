@@ -20,8 +20,8 @@ export function useOsDark() {
 }
 
 /** A message that shows itself for a beat and then clears. */
-export function useTransientMessage(durationMs = messageDurationMs) {
-  const [current, setCurrent] = useState<{ text: string } | null>(null)
+export function useTransientMessage<T>(durationMs = messageDurationMs) {
+  const [current, setCurrent] = useState<{ value: T } | null>(null)
 
   useEffect(() => {
     if (!current) return
@@ -29,7 +29,7 @@ export function useTransientMessage(durationMs = messageDurationMs) {
     return () => clearTimeout(timer)
   }, [current, durationMs])
 
-  const show = useCallback((text: string) => setCurrent({ text }), [])
+  const show = useCallback((value: T) => setCurrent({ value }), [])
 
-  return [current?.text ?? null, show] as const
+  return [current?.value ?? null, show] as const
 }

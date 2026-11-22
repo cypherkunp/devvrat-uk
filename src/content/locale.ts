@@ -12,6 +12,8 @@ export type ActionCopy = {
   label: string
   title: string
   success: string
+  /** Shown when the clipboard refuses; `{url}` is the hub's host. */
+  failure: string
 }
 
 export type Locale = {

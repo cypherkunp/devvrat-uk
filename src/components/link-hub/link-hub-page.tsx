@@ -27,6 +27,7 @@ import {
   IdentityTile,
   LinkTile,
 } from '#/components/link-hub/tiles'
+import type { ActionMessage } from '#/components/link-hub/tiles'
 
 /** Two columns wide from md up; one column on phones. */
 const span2 = { md: 'span 2', lg: 'span 2' }
@@ -42,7 +43,7 @@ export type LinkHubPageProps = {
 
 export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
   const { identity } = locale
-  const [copyFeedback, showCopyFeedback] = useTransientMessage()
+  const [copyFeedback, showCopyFeedback] = useTransientMessage<ActionMessage>()
   const [monochrome, setMonochrome] = useState(false)
   const [schemeOverride, setSchemeOverride] = useState<'light' | 'dark' | null>(
     null,
@@ -61,9 +62,14 @@ export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
     try {
       await navigator.clipboard.writeText(hubUrl)
     } catch {
+      // Blocked or missing clipboard: say so, and hand over the URL to copy by hand.
+      showCopyFeedback({
+        text: copyAction.failure.replace('{url}', new URL(hubUrl).host),
+        tone: 'error',
+      })
       return
     }
-    showCopyFeedback(copyAction.success)
+    showCopyFeedback({ text: copyAction.success, tone: 'ok' })
     analytics.track({ type: 'action_click', actionId: copyUrlActionId })
   }
 
@@ -155,7 +161,6 @@ export function LinkHubPage({ locale, analytics, hubUrl }: LinkHubPageProps) {
                         title: copyAction.title,
                       }}
                       message={copyFeedback}
-                      tone="ok"
                       onActivate={() => {
                         void copyHubUrl()
                       }}
