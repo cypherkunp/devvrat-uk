@@ -3,6 +3,7 @@ import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 
 import { createFakeAnalytics } from '#/analytics/port'
 import { loadLocale } from '#/content/locale'
+import type { LinkCopy } from '#/content/locale'
 import { LinkHubPage } from '#/components/link-hub/link-hub-page'
 
 /* Motion reads prefers-reduced-motion once per environment, so this seam lives in
@@ -40,9 +41,11 @@ function renderPage() {
   return { locale, analytics }
 }
 
-function linkName(copy: { label: string; title: string; handle?: string }) {
+function linkName(copy: LinkCopy) {
   const name =
-    copy.title === copy.label ? copy.label : `${copy.label}: ${copy.title}`
+    !copy.title || copy.title === copy.label
+      ? copy.label
+      : `${copy.label}: ${copy.title}`
   return copy.handle ? `${name} (${copy.handle})` : name
 }
 

@@ -33,15 +33,11 @@ async function readSnapshot(): Promise<{ raw: string; previews: OgPreviews }> {
 
 async function main() {
   const { raw, previews: previous } = await readSnapshot()
-  const resolved = await resolveOgPreviews(hubLinks, fetcher)
-
-  const next: OgPreviews = {}
-  for (const link of hubLinks) {
-    if (!link.ogPreview) continue
-    const preview = resolved[link.id] ?? previous[link.id]
-    if (preview) next[link.id] = preview
+  const next = await resolveOgPreviews(hubLinks, fetcher, { previous })
+  for (const [id, preview] of Object.entries(next)) {
+    const fresh = preview !== previous[id as keyof OgPreviews]
     console.log(
-      `og-preview ${link.id}: ${resolved[link.id] ? 'resolved' : preview ? 'kept last snapshot' : 'none'}`,
+      `og-preview ${id}: ${fresh ? 'resolved' : 'kept last snapshot'}`,
     )
   }
 

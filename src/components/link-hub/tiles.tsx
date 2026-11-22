@@ -2,8 +2,7 @@ import type { ReactNode } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 
 import type { ConfiguredLink } from '#/content/hub-config'
-import type { LinkCopy } from '#/content/locale'
-import type { LinkTileCopy } from '#/content/og-preview'
+import type { ActionCopy, LinkCopy } from '#/content/locale'
 import { Badge } from '#/components/geist/components'
 import { feedbackEnter, feedbackExit } from '#/components/link-hub/motion'
 import { tileArt } from '#/components/link-hub/tile-art'
@@ -31,8 +30,11 @@ export function tileClass(
     .join(' ')
 }
 
+/** An Action's caption: always titled, never a handle. */
+type ActionCaption = Pick<ActionCopy, 'label' | 'title'>
+
 function controlLabel({ label, title, handle }: LinkCopy) {
-  const name = title === label ? label : `${label}: ${title}`
+  const name = !title || title === label ? label : `${label}: ${title}`
   return handle ? `${name} (${handle})` : name
 }
 
@@ -66,7 +68,7 @@ function TileCaption({
   title,
   description,
   handle,
-}: Omit<LinkTileCopy, 'label' | 'image'>) {
+}: Omit<LinkCopy, 'label' | 'image'>) {
   return (
     <span className="min-w-0">
       <span className="text-label-14 block truncate text-[var(--hub-fg)]">
@@ -139,7 +141,7 @@ function StatusMessage({ children, tone }: { children: string; tone: Tone }) {
   )
 }
 
-function CaptionBody({ title, handle }: Omit<LinkCopy, 'label'>) {
+function CaptionBody({ title }: { title: string }) {
   return (
     <motion.span
       initial={false}
@@ -154,11 +156,6 @@ function CaptionBody({ title, handle }: Omit<LinkCopy, 'label'>) {
       <span className="text-label-14 block truncate text-[var(--hub-fg)]">
         {title}
       </span>
-      {handle ? (
-        <span className="text-label-13-mono mt-0.5 block truncate text-[var(--hub-muted)]">
-          {handle}
-        </span>
-      ) : null}
     </motion.span>
   )
 }
@@ -199,7 +196,7 @@ export function LinkTile({
   onActivate,
 }: {
   link: ConfiguredLink
-  copy: LinkTileCopy
+  copy: LinkCopy
   onActivate: () => void
 }) {
   const art = tileArt[link.id]
@@ -251,7 +248,7 @@ export function ActionButton({
   onActivate,
 }: {
   art: TileArt
-  copy: LinkCopy
+  copy: ActionCaption
   message: ActionMessage | null
   onActivate: () => void
 }) {
@@ -303,7 +300,7 @@ export function ActionSwitch({
   onCheckedChange,
 }: {
   art: TileArt
-  copy: LinkCopy
+  copy: ActionCaption
   checked: boolean
   onCheckedChange: (next: boolean) => void
 }) {

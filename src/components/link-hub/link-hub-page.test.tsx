@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { createFakeAnalytics } from '#/analytics/port'
 import { loadLocale } from '#/content/locale'
+import type { LinkCopy } from '#/content/locale'
 import type { OgPreviews } from '#/content/og-preview'
 import { LinkHubPage } from '#/components/link-hub/link-hub-page'
 
@@ -24,9 +25,11 @@ function renderPage(ogPreviews: OgPreviews = {}) {
   return { locale, analytics }
 }
 
-function linkName(copy: { label: string; title: string; handle?: string }) {
+function linkName(copy: LinkCopy) {
   const name =
-    copy.title === copy.label ? copy.label : `${copy.label}: ${copy.title}`
+    !copy.title || copy.title === copy.label
+      ? copy.label
+      : `${copy.label}: ${copy.title}`
   return copy.handle ? `${name} (${copy.handle})` : name
 }
 
@@ -288,22 +291,6 @@ describe('Link Hub page', () => {
     })
     expect(projects.querySelector('img')).toBeNull()
     expect(projects.textContent).toBe('Projectscypherkunp.github.io')
-  })
-
-  it('ignores OG data for Links that do not opt in', () => {
-    const { locale } = renderPage({
-      github: {
-        title: 'Injected',
-        description: 'Not shown',
-        image: 'https://example.com/x.png',
-      },
-    })
-
-    const github = screen.getByRole('link', {
-      name: linkName(locale.links.github),
-    })
-    expect(github.textContent).toBe('GitHubcypherkunp')
-    expect(github.querySelector('img')).toBeNull()
   })
 
   it('records link_click for the resume Link on the hire tile', () => {

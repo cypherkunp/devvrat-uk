@@ -2,17 +2,16 @@ import en from './locales/en.json'
 
 export type LocaleId = 'en'
 
+/**
+ * What a Link tile shows. The Locale writes the label and handle; any of
+ * title, description and image it leaves out may come from OG preview.
+ */
 export type LinkCopy = {
-  label: string
-  title: string
-  handle?: string
-}
-
-/** A Link as the Locale writes it. Fields left out may come from OG preview. */
-export type LinkLocaleCopy = {
   label: string
   title?: string
   description?: string
+  /** A same-origin path; the Locale leaves it to OG preview. */
+  image?: string
   handle?: string
 }
 
@@ -41,7 +40,8 @@ export type Locale = {
     handbook: LinkCopy
     photos: LinkCopy
     resume: LinkCopy
-    projects: LinkLocaleCopy
+    /** No title, so the tile shows the OG preview title. */
+    projects: LinkCopy
   }
   actions: {
     'copy-url': ActionCopy

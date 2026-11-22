@@ -9,7 +9,7 @@ import {
   monoActionId,
 } from '#/content/hub-config'
 import type { Locale } from '#/content/locale'
-import { mergeOgPreview } from '#/content/og-preview'
+import { linkTileCopy } from '#/content/og-preview'
 import type { OgPreviews } from '#/content/og-preview'
 import {
   Avatar,
@@ -41,7 +41,7 @@ export type LinkHubPageProps = {
   locale: Locale
   analytics: AnalyticsPort
   hubUrl: string
-  /** Build-time OG preview snapshot; applied only to Links that opt in. */
+  /** Build-time OG preview snapshot, keyed by the Links that opt in. */
   ogPreviews?: OgPreviews
 }
 
@@ -138,15 +138,7 @@ export function LinkHubPage({
                     <GridCell key={link.id} solid={link.highlighted}>
                       <LinkTile
                         link={link}
-                        copy={mergeOgPreview(
-                          link.id === 'resume'
-                            ? {
-                                ...locale.links.resume,
-                                title: identity.availability,
-                              }
-                            : locale.links[link.id],
-                          link.ogPreview ? ogPreviews[link.id] : undefined,
-                        )}
+                        copy={linkTileCopy(link, locale, ogPreviews)}
                         onActivate={() =>
                           analytics.track({
                             type: 'link_click',

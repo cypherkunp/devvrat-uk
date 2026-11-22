@@ -116,4 +116,19 @@ describe('OG preview resolution', () => {
       resolveOgPreviews(links, fetcher, { timeoutMs: 20 }),
     ).resolves.toEqual({})
   })
+
+  it('keeps the last snapshot entry of an opted-in Link whose destination fails', async () => {
+    const fetcher: OgFetcher = async () => {
+      throw new TypeError('fetch failed')
+    }
+
+    expect(
+      await resolveOgPreviews([projects], fetcher, {
+        previous: {
+          projects: { title: 'Last known' },
+          github: { title: 'No longer opted in' },
+        },
+      }),
+    ).toEqual({ projects: { title: 'Last known' } })
+  })
 })

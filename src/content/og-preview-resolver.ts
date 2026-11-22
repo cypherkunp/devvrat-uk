@@ -114,13 +114,18 @@ async function previewOf(
 }
 
 /**
- * OG preview for every https Link that opts in. Never throws: a failed, slow,
- * or empty destination is simply absent from the result.
+ * The OG preview snapshot: one entry for every https Link that opts in, and
+ * none for any other Link. This is the only place the opt-in is read. Never
+ * throws: a failed, slow, or empty destination keeps its `previous` entry, or
+ * has none.
  */
 export async function resolveOgPreviews(
   links: ConfiguredLink[],
   fetcher: OgFetcher,
-  { timeoutMs = 5000 }: { timeoutMs?: number } = {},
+  {
+    previous = {},
+    timeoutMs = 5000,
+  }: { previous?: OgPreviews; timeoutMs?: number } = {},
 ): Promise<OgPreviews> {
   const candidates = links.filter(
     (link) => link.ogPreview && link.href.startsWith('https://'),
@@ -134,7 +139,10 @@ export async function resolveOgPreviews(
 
   const previews: OgPreviews = {}
   for (const [id, preview] of resolved) {
-    if (preview && Object.keys(preview).length > 0) previews[id] = preview
+    const fresh =
+      preview && Object.keys(preview).length > 0 ? preview : undefined
+    const kept = fresh ?? previous[id]
+    if (kept) previews[id] = kept
   }
   return previews
 }
