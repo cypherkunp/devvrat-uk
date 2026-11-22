@@ -6,8 +6,9 @@
 import { readFile, writeFile } from 'node:fs/promises'
 
 import { hubLinks } from '../src/content/hub-config.ts'
-import { resolveOgPreviews } from '../src/content/og-preview.ts'
-import type { OgFetcher, OgPreviews } from '../src/content/og-preview.ts'
+import { resolveOgPreviews } from '../src/content/og-preview-resolver.ts'
+import type { OgFetcher } from '../src/content/og-preview-resolver.ts'
+import type { OgPreviews } from '../src/content/og-preview.ts'
 
 const snapshotUrl = new URL('../src/content/og-previews.json', import.meta.url)
 
