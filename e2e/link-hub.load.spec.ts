@@ -1,7 +1,6 @@
 import { expect, test } from '@playwright/test'
 
 import { hubLinks } from '../src/content/hub-config'
-import snapshot from '../src/content/og-previews.json' with { type: 'json' }
 
 const outboundHttpHrefs = hubLinks.flatMap((link) =>
   link.href.startsWith('http') ? [link.href] : [],
@@ -40,7 +39,7 @@ test('Link Hub lists every outbound http Link', async ({ page }) => {
   expect(hrefs).toContain('https://cypherkunp.github.io/')
 })
 
-test('Link Hub renders OG preview from the build snapshot without fetching destinations', async ({
+test('Link Hub tiles all render from Locale copy without fetching destinations', async ({
   page,
 }) => {
   const destinationHosts = new Set(
@@ -59,19 +58,8 @@ test('Link Hub renders OG preview from the build snapshot without fetching desti
   ).toBeVisible()
 
   const projects = page.locator('a[href="https://cypherkunp.github.io/"]')
-  const preview = snapshot.projects
-  await expect(projects).toContainText(preview.title)
-  await expect(projects).toContainText(preview.description)
-  expect(preview.image).toMatch(/^\/og-previews\//)
-  await expect(projects.locator('img')).toHaveAttribute('src', preview.image)
-  await expect
-    .poll(() =>
-      projects
-        .locator('img')
-        .evaluate((img: HTMLImageElement) => img.naturalWidth),
-    )
-    .toBeGreaterThan(0)
-  await expect(projects.locator('img')).toHaveAttribute('alt', '')
+  await expect(projects).toHaveText('Projectscypherkunp.github.io')
+  await expect(projects.locator('img')).toHaveCount(0)
   expect(destinationRequests).toEqual([])
 })
 
